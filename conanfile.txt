@@ -1,6 +1,7 @@
 [requires]
 gtest/cci.20210126
 cpr/1.6.2
+fmt/8.0.1
 
 [generators]
 cmake_find_package
