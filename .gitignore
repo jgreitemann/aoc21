@@ -1,0 +1,5 @@
+cmake-build-*
+build
+.session
+**/.DS_Store
+.idea
