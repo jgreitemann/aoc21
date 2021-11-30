@@ -2,9 +2,7 @@
 #include <cpr/cpr.h>
 
 int main() {
-  std::ifstream session_stream{".session"};
-  std::string session{std::istreambuf_iterator<char>{session_stream}, std::istreambuf_iterator<char>{}};
-  std::cout << session << '\n';
+  std::string session{std::getenv("SESSION")};
   cpr::Response r = cpr::Get(cpr::Url{"https://adventofcode.com/2020/day/18/input"},
                              cpr::Cookies{{"session", std::move(session)}});
   std::cout << r.text << '\n';

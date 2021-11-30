@@ -23,5 +23,8 @@ to [adventofcode.com](https://adventofcode.com/), log in with whatever service y
 
 Next, find your session cookie. For instance, in Firefox, you can right-click the website anywhere, choose _Inspect_,
 select the _Storage_ tab, select _Cookies → https://adventofcode.com_ from the tree view on the left-hand-side, and copy
-the value of the cookie named `session`. Place this cookie (a long hex string) in a file named `.session` in the current
-working directory from which you will run the `aoc21` executable.
+the value of the cookie named `session`. Set this cookie (a long hex string) as an environment variable `SESSION`:
+
+```bash
+$ export SESSION=8badf00d...
+```
