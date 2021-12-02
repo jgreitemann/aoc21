@@ -38,4 +38,4 @@ target_link_libraries(aoc21-test
         GTest::GTest
 )
 
-add_subdirectory(day00)
+add_subdirectory(day01)
