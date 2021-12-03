@@ -5,14 +5,13 @@
 #include <ranges>
 #include <vector>
 
+#include <cor3ntin/rangesnext/to.hpp>
+
 namespace Day01 {
 
   auto parse(std::istream &stream) -> std::vector<int> {
-    std::vector<int> v;
-    std::copy(std::istream_iterator<int>{stream},
-              std::istream_iterator<int>{},
-              std::back_inserter(v));
-    return v;
+    using cor3ntin::rangesnext::to;
+    return std::ranges::subrange{std::istream_iterator<int>{stream}, std::istream_iterator<int>{}} | to<std::vector>();
   }
 
   auto number_of_increases(std::span<int const> measurements) -> std::size_t {

@@ -7,11 +7,13 @@ include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 find_package(fmt)
 find_package(OpenSSL)
+find_package(rangesnext)
 
 add_library(solutions STATIC)
 target_link_libraries(solutions
     PRIVATE
         fmt::fmt
+        rangesnext::rangesnext
 )
 
 add_executable(aoc21 main.cpp input.cpp)
