@@ -1,10 +1,12 @@
 #include <fmt/format.h>
 
 #include "day01/solution.h"
+#include "day03/solution.h"
 #include "input.h"
 #include "solution.h"
 
 extern template struct AoC::Solution<1>;
+extern template struct AoC::Solution<3>;
 
 template <typename ThisSolution>
 void handle_day(int day) {
