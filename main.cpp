@@ -6,8 +6,23 @@
 
 extern template struct AoC::Solution<1>;
 
+template <typename ThisSolution>
+void handle_day(int day) {
+  if constexpr (AoC::partially_solved<ThisSolution>) {
+    auto stream = AoC::input_stream(1);
+    ThisSolution solution{stream};
+    fmt::print("Day {:02}, Part 1: {}\n", day, solution.part1());
+    if constexpr (AoC::fully_solved<ThisSolution>) {
+      fmt::print("Day {:02}, Part 2: {}\n", day, solution.part2());
+    }
+  }
+}
+
+template <int... Days>
+void handle_all_days(std::integer_sequence<int, 0, Days...>) {
+  (handle_day<AoC::Solution<Days>>(Days), ...);
+}
+
 int main() {
-  auto stream = AoC::input_stream(1);
-  AoC::Solution<1> day01{stream};
-  fmt::print("Day 01, Part 1: {}", day01.part1());
+  handle_all_days(std::make_integer_sequence<int, 26>{});
 }
