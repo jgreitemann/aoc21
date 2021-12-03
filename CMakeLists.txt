@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 find_package(fmt)
+find_package(httplib)
 find_package(OpenSSL)
 find_package(rangesnext)
 
@@ -21,6 +22,7 @@ target_link_libraries(aoc21
     PRIVATE
         solutions
         fmt::fmt
+        httplib::httplib
         OpenSSL::OpenSSL
 )
 target_compile_definitions(aoc21
