@@ -14,7 +14,9 @@ FetchContent_Declare(rangesnext
     GIT_REPOSITORY https://github.com/cor3ntin/rangesnext.git
     GIT_TAG        056d3d22f007f8eef1692954660be8e77a50e315
 )
-FetchContent_MakeAvailable(rangesnext)
+FetchContent_Populate(rangesnext)
+add_library(rangesnext INTERFACE)
+target_include_directories(rangesnext INTERFACE ${rangesnext_SOURCE_DIR}/include)
 
 add_library(solutions STATIC)
 target_link_libraries(solutions
