@@ -14,6 +14,7 @@ add_library(solutions STATIC)
 target_link_libraries(solutions
     PRIVATE
         fmt::fmt
+    PUBLIC
         rangesnext::rangesnext
 )
 
@@ -40,6 +41,7 @@ target_link_libraries(aoc21-test
     PRIVATE
         solutions
         GTest::GTest
+        rangesnext::rangesnext
 )
 
 add_subdirectory(day01)
