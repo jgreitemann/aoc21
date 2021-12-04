@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace Day03 {
-  auto most_common_bits(std::vector<std::string> const& report) -> std::string;
+  auto most_common_bits(std::vector<std::string> const&col) -> std::string;
   auto binary_to_decimal(std::string const& binary_string ) -> int;
   auto binary_complement(int number, int size) -> int;
 }
