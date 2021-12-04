@@ -25,4 +25,6 @@ TEST(Day02, parse_course) {
   EXPECT_TRUE(std::ranges::equal(parse(stream), EXAMPLE_COURSE));
 }
 
-TEST(Day02, track_sub) { EXPECT_EQ(track_sub(EXAMPLE_COURSE), (Position{15, 10})); }
+TEST(Day02, track_sub1) { EXPECT_EQ(track_sub1(EXAMPLE_COURSE), (Position{15, 10})); }
+
+TEST(Day02, track_sub2) { EXPECT_EQ(track_sub2(EXAMPLE_COURSE), (Position{15, 60, 10})); }

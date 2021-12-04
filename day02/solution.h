@@ -25,12 +25,15 @@ namespace Day02 {
   struct Position {
     int lateral;
     int depth;
+    int aim;
     bool operator==(Position const &) const = default;
   };
 
   auto parse(std::istream &stream) -> std::vector<Command>;
 
-  auto track_sub(std::span<Command const> course) -> Position;
+  auto track_sub1(std::span<Command const> course) -> Position;
+
+  auto track_sub2(std::span<Command const> course) -> Position;
 
 }// namespace Day02
 
@@ -40,6 +43,7 @@ namespace AoC {
   struct Solution<2> {
     explicit Solution(std::istream &);
     auto part1() const -> int;
+    auto part2() const -> int;
 
   private:
     std::vector<Day02::Command> course;
