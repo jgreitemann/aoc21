@@ -29,11 +29,11 @@ BraceWrapping:
   IndentBraces: false
   SplitEmptyFunction: false
   SplitEmptyRecord: true
-BreakBeforeBinaryOperators: None
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeColon
-ColumnLimit: 0
+ColumnLimit: 100
 CompactNamespaces: false
 ContinuationIndentWidth: 8
 IndentCaseLabels: true
