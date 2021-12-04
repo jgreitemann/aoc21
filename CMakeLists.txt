@@ -8,14 +8,20 @@ include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 find_package(fmt)
 find_package(httplib)
 find_package(OpenSSL)
-find_package(rangesnext)
+
+include(FetchContent)
+FetchContent_Declare(rangesnext
+    GIT_REPOSITORY https://github.com/cor3ntin/rangesnext.git
+    GIT_TAG        056d3d22f007f8eef1692954660be8e77a50e315
+)
+FetchContent_MakeAvailable(rangesnext)
 
 add_library(solutions STATIC)
 target_link_libraries(solutions
     PRIVATE
         fmt::fmt
     PUBLIC
-        rangesnext::rangesnext
+        rangesnext
 )
 
 add_executable(aoc21 main.cpp input.cpp)
@@ -41,7 +47,7 @@ target_link_libraries(aoc21-test
     PRIVATE
         solutions
         GTest::GTest
-        rangesnext::rangesnext
+        rangesnext
 )
 
 add_subdirectory(day01)
