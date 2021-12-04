@@ -23,4 +23,12 @@ namespace AoC {
     return {std::istreambuf_iterator<char>{stream}, std::istreambuf_iterator<char>{}};
   }
 
+  template <typename... Bases>
+  struct overload : Bases... {
+    using Bases::operator()...;
+  };
+
+  template <typename... Bases>
+  overload(Bases&&...) -> overload<Bases...>;
+
 }// namespace AoC
