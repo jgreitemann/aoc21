@@ -19,16 +19,4 @@ namespace AoC {
   template <int day>
   struct Solution {};
 
-  inline auto as_string(std::istream &stream) -> std::string {
-    return {std::istreambuf_iterator<char>{stream}, std::istreambuf_iterator<char>{}};
-  }
-
-  template <typename... Bases>
-  struct overload : Bases... {
-    using Bases::operator()...;
-  };
-
-  template <typename... Bases>
-  overload(Bases&&...) -> overload<Bases...>;
-
 }// namespace AoC

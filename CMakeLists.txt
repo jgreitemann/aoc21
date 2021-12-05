@@ -18,7 +18,7 @@ FetchContent_Populate(rangesnext)
 add_library(rangesnext INTERFACE)
 target_include_directories(rangesnext INTERFACE ${rangesnext_SOURCE_DIR}/include)
 
-add_library(solutions STATIC)
+add_library(solutions STATIC utils.cpp)
 target_link_libraries(solutions
     PRIVATE
         fmt::fmt

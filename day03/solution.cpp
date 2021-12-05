@@ -1,4 +1,5 @@
 #include "solution.h"
+#include "../utils.h"
 
 #include <algorithm>
 #include <iostream>
@@ -8,12 +9,6 @@
 
 
 namespace Day03 {
-
-  auto parse(std::istream &stream) -> std::vector<std::string> {
-    std::vector<std::string> v;
-    std::ranges::copy(std::ranges::istream_view<std::string>(stream), std::back_inserter(v));
-    return v;
-  }
 
   auto get_most_common_bit(std::span<std::string const> report, size_t col) -> char {
     size_t zeroes = std::ranges::count(
@@ -29,7 +24,7 @@ namespace Day03 {
     return report.size() >= 2 * zeroes ? '0' : '1';
   }
 
-  auto most_common_bits(std::span<std::string const> report) -> std::string {
+  auto most_common_bits(std::vector<std::string> const &report) -> std::string {
     std::string result{};
 
     std::ranges::copy(std::views::iota(0ul, report.front().size())
@@ -80,7 +75,7 @@ namespace Day03 {
 namespace AoC {
 
   Solution<3>::Solution(std::istream &stream)
-      : report{Day03::parse(stream)} {}
+      : report{AoC::parse_vec<std::string>(stream)} {}
 
   auto Solution<3>::part1() const -> int {
     using namespace Day03;
