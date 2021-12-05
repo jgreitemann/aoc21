@@ -29,8 +29,6 @@ namespace Day02 {
     bool operator==(Position const &) const = default;
   };
 
-  auto parse(std::istream &stream) -> std::vector<Command>;
-
   auto track_sub1(std::span<Command const> course) -> Position;
 
   auto track_sub2(std::span<Command const> course) -> Position;

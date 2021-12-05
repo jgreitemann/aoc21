@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../utils.h"
 #include "solution.h"
 
 #include <algorithm>
@@ -22,7 +23,7 @@ constexpr Command EXAMPLE_COURSE[] = {HorizontalDive{5}, VerticalDive{-5}, Horiz
 
 TEST(Day02, parse_course) {
   std::stringstream stream{std::string{EXAMPLE_INPUT}};
-  EXPECT_TRUE(std::ranges::equal(parse(stream), EXAMPLE_COURSE));
+  EXPECT_TRUE(std::ranges::equal(AoC::parse_vec<Command>(stream), EXAMPLE_COURSE));
 }
 
 TEST(Day02, track_sub1) { EXPECT_EQ(track_sub1(EXAMPLE_COURSE), (Position{15, 10})); }

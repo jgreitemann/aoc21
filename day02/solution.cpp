@@ -1,4 +1,5 @@
 #include "solution.h"
+#include "../utils.h"
 
 #include <numeric>
 #include <ranges>
@@ -19,11 +20,6 @@ namespace Day02 {
     else
       is.setstate(std::ios_base::failbit);
     return is;
-  }
-
-  auto parse(std::istream &stream) -> std::vector<Command> {
-    using cor3ntin::rangesnext::to;
-    return std::ranges::istream_view<Command>(stream) | to<std::vector>();
   }
 
   auto track_sub1(std::span<Command const> course) -> Position {
@@ -55,7 +51,7 @@ namespace Day02 {
 namespace AoC {
 
   Solution<2>::Solution(std::istream &stream)
-      : course{Day02::parse(stream)} {}
+      : course{AoC::parse_vec<Day02::Command>(stream)} {}
 
   auto Solution<2>::part1() const -> int {
     auto const final_pos = Day02::track_sub1(course);
