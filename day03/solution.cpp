@@ -24,7 +24,7 @@ namespace Day03 {
     return report.size() >= 2 * zeroes ? '0' : '1';
   }
 
-  auto most_common_bits(std::vector<std::string> const &report) -> std::string {
+  auto most_common_bits(std::span<std::string const> report) -> std::string {
     std::string result{};
 
     std::ranges::copy(std::views::iota(0ul, report.front().size())
