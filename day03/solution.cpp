@@ -15,14 +15,21 @@ namespace Day03 {
     return v;
   }
 
-  auto get_most_common_bit(std::vector<std::string> const &report, size_t col) -> char {
+  auto get_most_common_bit(std::span<std::string const> report, size_t col) -> char {
     size_t zeroes = std::ranges::count(
             report | std::views::transform([col](auto const &line) { return line[col]; }), '0');
 
     return report.size() >= 2 * zeroes ? '1' : '0';
   }
 
-  auto most_common_bits(std::vector<std::string> const &report) -> std::string {
+  auto get_least_common_bit(std::span<std::string const> report, size_t col) -> char {
+    size_t zeroes = std::ranges::count(
+            report | std::views::transform([col](auto const &line) { return line[col]; }), '0');
+
+    return report.size() >= 2 * zeroes ? '0' : '1';
+  }
+
+  auto most_common_bits(std::span<std::string const> report) -> std::string {
     std::string result{};
 
     std::ranges::copy(std::views::iota(0ul, report.front().size())
@@ -41,17 +48,32 @@ namespace Day03 {
 
   auto binary_complement(int number, int size) -> int { return (1 << size) - number - 1; }
 
-  auto calculate_oxygen_generator_rating(std::vector<std::string> input) -> std::string {
-    for (size_t col : std::views::iota(0ul, input.front().size())) {
-      char most_common_bit = get_most_common_bit(input, col);
-      std::erase_if(input, [col, most_common_bit](std::string const &line) {
-        return line[col] != most_common_bit;
-      });
-      if (input.size() == 1) break;
-    }
-    return input.front();
+  template <typename FilterStrategy>
+  auto calculate_rating(std::span<std::string const> report, FilterStrategy &&strat)
+          -> std::string {
+    auto indices = std::views::iota(0ul, report.front().size()) | std::views::common;
+
+    return std::accumulate(indices.begin(), indices.end(),
+                           std::vector<std::string>{report.begin(), report.end()},
+                           [&strat](auto list, std::size_t col) {
+                             if (list.size() > 1) {
+                               std::erase_if(list, [col, most_common_bit = strat(list, col)](
+                                                           std::string const &line) {
+                                 return line[col] != most_common_bit;
+                               });
+                             }
+                             return list;
+                           })
+            .front();
   }
 
+  auto calculate_oxygen_generator_rating(std::span<std::string const> report) -> std::string {
+    return calculate_rating(report, get_most_common_bit);
+  }
+
+  auto calculate_CO2_scrubber_rating(std::span<std::string const> report) -> std::string {
+    return calculate_rating(report, get_least_common_bit);
+  }
 
 }// namespace Day03
 
@@ -67,6 +89,11 @@ namespace AoC {
     return gamma * epsilon;
   }
 
-  auto Solution<3>::part2() const -> int { return 42; }
+  auto Solution<3>::part2() const -> int {
+    using namespace Day03;
+    int oxygen_generator_rating = binary_to_decimal(calculate_oxygen_generator_rating(report));
+    int CO2_scrubber_rating = binary_to_decimal(calculate_CO2_scrubber_rating(report));
+    return oxygen_generator_rating * CO2_scrubber_rating;
+  }
 
 }// namespace AoC
