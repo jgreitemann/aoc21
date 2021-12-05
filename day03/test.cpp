@@ -39,3 +39,10 @@ TEST(Day03, part1) {
   AoC::Solution<3> solution(report);
   EXPECT_EQ(solution.part1(), 198);
 }
+
+TEST(Day03, calculate_oxygen_generator_rating)
+{
+  std::vector<std::string> report = {"00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"};
+  EXPECT_EQ(Day03::calculate_oxygen_generator_rating(report), "10111");
+}
+
