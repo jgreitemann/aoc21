@@ -3,6 +3,7 @@
 #include "day01/solution.h"
 #include "day02/solution.h"
 #include "day03/solution.h"
+#include "day04/solution.h"
 #include "day05/solution.h"
 
 #include "input.h"
@@ -11,6 +12,7 @@
 extern template struct AoC::Solution<1>;
 extern template struct AoC::Solution<2>;
 extern template struct AoC::Solution<3>;
+extern template struct AoC::Solution<4>;
 extern template struct AoC::Solution<5>;
 
 template <typename ThisSolution>
