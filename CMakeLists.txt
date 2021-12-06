@@ -10,6 +10,7 @@ find_package(httplib)
 find_package(OpenSSL)
 
 include(FetchContent)
+
 FetchContent_Declare(rangesnext
     GIT_REPOSITORY https://github.com/cor3ntin/rangesnext.git
     GIT_TAG        056d3d22f007f8eef1692954660be8e77a50e315
@@ -18,12 +19,21 @@ FetchContent_Populate(rangesnext)
 add_library(rangesnext INTERFACE)
 target_include_directories(rangesnext INTERFACE ${rangesnext_SOURCE_DIR}/include)
 
+FetchContent_Declare(mdspan
+    GIT_REPOSITORY https://github.com/kokkos/mdspan.git
+    GIT_TAG        a0aa4d9a3c401f23b18db91cac68fbb6b5bd0528
+)
+FetchContent_Populate(mdspan)
+add_library(mdspan INTERFACE)
+target_include_directories(mdspan INTERFACE ${mdspan_SOURCE_DIR}/include)
+
 add_library(solutions STATIC utils.cpp)
 target_link_libraries(solutions
     PRIVATE
         fmt::fmt
     PUBLIC
         rangesnext
+        mdspan
 )
 
 add_executable(aoc21 main.cpp input.cpp)
@@ -55,3 +65,4 @@ target_link_libraries(aoc21-test
 add_subdirectory(day01)
 add_subdirectory(day02)
 add_subdirectory(day03)
+add_subdirectory(day05)

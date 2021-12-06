@@ -4,6 +4,7 @@
 #include <ranges>
 #include <vector>
 
+#include <cor3ntin/rangesnext/generator.hpp>
 #include <cor3ntin/rangesnext/to.hpp>
 
 namespace AoC {
@@ -15,6 +16,8 @@ namespace AoC {
     using cor3ntin::rangesnext::to;
     return std::ranges::istream_view<T>(stream) | to<std::vector>();
   }
+
+  auto lines(std::istream &stream) -> cor3ntin::rangesnext::generator<std::string>;
 
   template <typename... Bases>
   struct overload : Bases... {
