@@ -43,7 +43,7 @@ namespace Day05 {
 
   auto points_on_line(Line const &line) -> cor3ntin::rangesnext::generator<Point> {
     Point delta = line.second - line.first;
-    delta /= delta.abs();
+    delta /= delta.norm1();
     Point p = line.first;
     for (; p != line.second; p += delta)
       co_yield p;
