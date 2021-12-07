@@ -3,6 +3,7 @@
 
 #include "solution.h"
 
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -54,6 +55,14 @@ constexpr std::array EXAMPLE_BOARDS = {
         22, 11, 13,  6,  5,
          2,  0, 12,  3,  7,
 };
+
+constexpr std::array EXAMPLE_BINGO_BOARD = {
+        MK, MK, MK, MK, MK,
+        10, 16, 15, MK, 19,
+        18,  8, MK, 26, 20,
+        22, MK, 13,  6, MK,
+        MK, MK, 12,  3, MK,
+};
 // clang-format on
 
 TEST(Day04, parse_numbers_and_boards) {
@@ -67,11 +76,69 @@ TEST(Day04, parse_numbers_and_boards) {
 }
 
 TEST(Day04, view_into_bingo_boards) {
-  BoardsConstView boards{EXAMPLE_BOARDS.data()};
+  AllBoardsConstView boards{EXAMPLE_BOARDS.data()};
   //           board row column
   //               |  |  |
   EXPECT_EQ(boards(1, 1, 1), 18);
   EXPECT_EQ(boards(0, 0, 1), 13);
   EXPECT_EQ(boards(1, 3, 4), 4);
   EXPECT_EQ(boards(2, 4, 4), 7);
+}
+
+TEST(Day04, get_board) {
+  AllBoardsConstView boards{EXAMPLE_BOARDS.data()};
+  auto second_board = get_board(boards, 1);
+  EXPECT_EQ(second_board(0, 0), 3);
+  EXPECT_EQ(second_board(0, 1), 15);
+  EXPECT_EQ(second_board(1, 0), 9);
+  EXPECT_EQ(second_board(4, 4), 6);
+}
+
+TEST(Day04, is_bingo) {
+  AllBoardsConstView boards{EXAMPLE_BOARDS.data()};
+  BoardConstView bingo_board{EXAMPLE_BINGO_BOARD.data()};
+  EXPECT_FALSE(is_bingo(get_board(boards, 0)));
+  EXPECT_FALSE(is_bingo(get_board(boards, 1)));
+  EXPECT_FALSE(is_bingo(get_board(boards, 2)));
+  EXPECT_TRUE(is_bingo(bingo_board));
+}
+
+TEST(Day04, sum_of_unmarked_numbers) {
+  BoardConstView bingo_board{EXAMPLE_BINGO_BOARD.data()};
+  EXPECT_EQ(sum_of_unmarked_numbers(bingo_board), 188);
+}
+
+TEST(Day04, marking_numbers) {
+  auto boards_data = EXAMPLE_BOARDS;
+  AllBoardsView boards{boards_data.data(), boards_data.size() / 25};
+
+  // marking the first few numbers: no winners at this point
+  for (BoardView this_board : iter_boards(boards)) {
+    for (int num : EXAMPLE_NUMBERS | std::views::take(11))
+      mark(this_board, num);
+    EXPECT_FALSE(is_bingo(this_board));
+  }
+
+  // mark the final number: board #2 has bingo!
+  for (BoardView this_board : iter_boards(boards))
+    mark(this_board, 24);
+  EXPECT_FALSE(is_bingo(get_board(boards, 0)));
+  EXPECT_FALSE(is_bingo(get_board(boards, 1)));
+  EXPECT_TRUE(is_bingo(get_board(boards, 2)));
+
+  auto winner = get_board(boards, 2);
+  auto winner_span = std::span<int const>{winner.data(), winner.data() + winner.size()};
+  EXPECT_THAT(EXAMPLE_BINGO_BOARD, ::testing::ElementsAreArray(winner_span));
+}
+
+TEST(Day04, get_winning_score) {
+  auto boards_data = EXAMPLE_BOARDS;
+  AllBoardsView boards{boards_data.data(), boards_data.size() / 25};
+  EXPECT_EQ(get_winning_score(boards, EXAMPLE_NUMBERS), 4512);
+}
+
+TEST(Day04, get_losing_score) {
+  auto boards_data = EXAMPLE_BOARDS;
+  AllBoardsView boards{boards_data.data(), boards_data.size() / 25};
+  EXPECT_EQ(get_losing_score(boards, EXAMPLE_NUMBERS), 1924);
 }
