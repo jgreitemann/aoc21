@@ -8,25 +8,6 @@
 
 namespace Day04 {
 
-  auto parse_numbers(std::istream &stream) -> std::vector<int> {
-    using cor3ntin::rangesnext::to;
-    using namespace std::string_view_literals;
-    std::string first_line;
-    if (std::getline(stream, first_line)) {
-      return std::views::split(first_line, ","sv) | std::views::transform([](auto &&num) {
-               auto common_num = num | std::views::common;
-               return std::stoi(std::string{common_num.begin(), common_num.end()});
-             })
-             | to<std::vector>();
-    } else {
-      return {};
-    }
-  }
-
-  auto parse_boards(std::istream &stream) -> std::vector<int> {
-    return AoC::parse_vec<int>(stream);
-  }
-
   constexpr auto row(BoardConstView board, std::size_t i) {
     auto row_view = std::experimental::submdspan(board, i, std::experimental::full_extent);
     return std::views::iota(0ul, row_view.extent(0))
@@ -115,8 +96,8 @@ namespace Day04 {
 namespace AoC {
 
   Solution<4>::Solution(std::istream &stream)
-      : numbers{Day04::parse_numbers(stream)}
-      , boards_storage{Day04::parse_boards(stream)} {}
+      : numbers{AoC::parse_comma_separated_ints_on_line(stream)}
+      , boards_storage{AoC::parse_vec<int>(stream)} {}
 
   auto Solution<4>::part1() const -> int {
     auto local_boards_storage = boards_storage;

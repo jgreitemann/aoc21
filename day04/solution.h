@@ -20,9 +20,6 @@ namespace Day04 {
   using BoardConstView = std::experimental::mdspan<int const, BoardExtents>;
   using BoardView = std::experimental::mdspan<int, BoardExtents>;
 
-  auto parse_numbers(std::istream &stream) -> std::vector<int>;
-  auto parse_boards(std::istream &stream) -> std::vector<int>;
-
   constexpr auto get_board(AllBoardsConstView boards, std::size_t i) -> BoardConstView {
     return std::experimental::submdspan(boards, i, std::experimental::full_extent,
                                         std::experimental::full_extent);

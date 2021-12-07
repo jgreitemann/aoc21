@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../utils.h"
 #include "solution.h"
 
 #include <span>
@@ -67,8 +68,8 @@ constexpr std::array EXAMPLE_BINGO_BOARD = {
 
 TEST(Day04, parse_numbers_and_boards) {
   std::stringstream stream{std::string{EXAMPLE}};
-  auto numbers = parse_numbers(stream);
-  auto boards = parse_boards(stream);
+  auto numbers = AoC::parse_comma_separated_ints_on_line(stream);
+  auto boards = AoC::parse_vec<int>(stream);
 
   using ::testing::ElementsAreArray;
   EXPECT_THAT(numbers, ElementsAreArray(EXAMPLE_NUMBERS));

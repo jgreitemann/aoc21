@@ -17,6 +17,8 @@ namespace AoC {
     return std::ranges::istream_view<T>(stream) | to<std::vector>();
   }
 
+  auto parse_comma_separated_ints_on_line(std::istream &stream) -> std::vector<int>;
+
   auto lines(std::istream &stream) -> cor3ntin::rangesnext::generator<std::string>;
 
   template <typename... Bases>

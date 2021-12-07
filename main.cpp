@@ -5,6 +5,7 @@
 #include "day03/solution.h"
 #include "day04/solution.h"
 #include "day05/solution.h"
+#include "day06/solution.h"
 
 #include "input.h"
 #include "solution.h"
@@ -14,6 +15,7 @@ extern template struct AoC::Solution<2>;
 extern template struct AoC::Solution<3>;
 extern template struct AoC::Solution<4>;
 extern template struct AoC::Solution<5>;
+extern template struct AoC::Solution<6>;
 
 template <typename ThisSolution>
 void handle_day(int day) {
