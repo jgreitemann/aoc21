@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../solution.h"
+#include "../utils.h"
 
 #include <span>
 #include <utility>
@@ -11,52 +12,7 @@
 
 namespace Day05 {
 
-  struct Point {
-    int x, y;
-    constexpr Point &operator+=(Point p) {
-      x += p.x;
-      y += p.y;
-      return *this;
-    }
-    constexpr Point &operator-=(Point p) {
-      x -= p.x;
-      y -= p.y;
-      return *this;
-    }
-    constexpr Point &operator*=(int s) {
-      x *= s;
-      y *= s;
-      return *this;
-    }
-    constexpr Point &operator*=(Point p) {
-      x *= p.x;
-      y *= p.y;
-      return *this;
-    }
-    constexpr Point &operator/=(int s) {
-      x /= s;
-      y /= s;
-      return *this;
-    }
-    constexpr Point &operator/=(Point p) {
-      x /= p.x;
-      y /= p.y;
-      return *this;
-    }
-    constexpr bool operator==(Point const &) const noexcept = default;
-    [[nodiscard]] constexpr Point abs() const { return {std::abs(x), std::abs(y)}; }
-    [[nodiscard]] constexpr int norm1() const { return std::max(std::abs(x), std::abs(y)); }
-  };
-
-  constexpr Point operator+(Point lhs, Point rhs) { return lhs += rhs; }
-  constexpr Point operator-(Point lhs, Point rhs) { return lhs -= rhs; }
-  constexpr Point operator*(Point lhs, int rhs) { return lhs *= rhs; }
-  constexpr Point operator*(int lhs, Point rhs) { return rhs *= lhs; }
-  constexpr Point operator*(Point lhs, Point rhs) { return lhs *= rhs; }
-  constexpr Point operator/(Point lhs, int rhs) { return lhs /= rhs; }
-  constexpr Point operator/(int lhs, Point rhs) { return rhs /= lhs; }
-  constexpr Point operator/(Point lhs, Point rhs) { return rhs /= lhs; }
-
+  using Point = AoC::Point<int>;
   using Line = std::pair<Point, Point>;
 
   using Extents2D = std::experimental::extents<std::experimental::dynamic_extent,

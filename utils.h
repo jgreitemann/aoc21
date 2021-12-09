@@ -29,4 +29,75 @@ namespace AoC {
   template <typename... Bases>
   overload(Bases &&...) -> overload<Bases...>;
 
+  template <typename T>
+  struct Point {
+    T x, y;
+    constexpr Point &operator+=(Point p) {
+      x += p.x;
+      y += p.y;
+      return *this;
+    }
+    constexpr Point &operator-=(Point p) {
+      x -= p.x;
+      y -= p.y;
+      return *this;
+    }
+    constexpr Point &operator*=(T s) {
+      x *= s;
+      y *= s;
+      return *this;
+    }
+    constexpr Point &operator*=(Point p) {
+      x *= p.x;
+      y *= p.y;
+      return *this;
+    }
+    constexpr Point &operator/=(T s) {
+      x /= s;
+      y /= s;
+      return *this;
+    }
+    constexpr Point &operator/=(Point p) {
+      x /= p.x;
+      y /= p.y;
+      return *this;
+    }
+    constexpr bool operator==(Point const &) const noexcept = default;
+    [[nodiscard]] constexpr Point abs() const { return {std::abs(x), std::abs(y)}; }
+    [[nodiscard]] constexpr int norm1() const { return std::max(std::abs(x), std::abs(y)); }
+  };
+
+  template <typename T>
+  constexpr Point<T> operator+(Point<T> lhs, Point<T> rhs) {
+    return lhs += rhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator-(Point<T> lhs, Point<T> rhs) {
+    return lhs -= rhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator*(Point<T> lhs, int rhs) {
+    return lhs *= rhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator*(int lhs, Point<T> rhs) {
+    return rhs *= lhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator*(Point<T> lhs, Point<T> rhs) {
+    return lhs *= rhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator/(Point<T> lhs, int rhs) {
+    return lhs /= rhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator/(int lhs, Point<T> rhs) {
+    return rhs /= lhs;
+  }
+  template <typename T>
+  constexpr Point<T> operator/(Point<T> lhs, Point<T> rhs) {
+    return rhs /= lhs;
+  }
+
 }// namespace AoC
