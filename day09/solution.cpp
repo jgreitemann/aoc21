@@ -62,6 +62,47 @@ namespace Day09 {
     return std::accumulate(risk_levels.begin(), risk_levels.end(), 0ul);
   }
 
+  auto basin_map(ElevationConstView map) -> std::vector<int> {
+    std::vector<int> basins(map.size(), -1);
+    ElevationView basins_map{basins.data(), map.extents()};
+
+    int next_basin = 1;
+    for (Point p : all_points(map.extents())) {
+      if (map(p.x, p.y) == 9) {
+        basins_map(p.x, p.y) = 0;
+      } else {
+        if (basins_map(p.x, p.y) == -1) {
+          if (auto adj_basin = std::ranges::max(surrounding_points(p, map.extents())
+                                                | std::views::transform([basins_map](Point q) {
+                                                    return basins_map(q.x, q.y);
+                                                  }));
+              adj_basin > 0)
+            basins_map(p.x, p.y) = adj_basin;
+          else
+            basins_map(p.x, p.y) = next_basin++;
+        }
+        for (Point q : surrounding_points(p, map.extents())
+                               | std::views::filter([map](Point q) { return map(q.x, q.y) < 9; }))
+          basins_map(q.x, q.y) = basins_map(p.x, p.y);
+      }
+    }
+
+    return basins;
+  }
+
+  auto histogrammize(std::span<int const> basin_map) -> std::vector<std::size_t> {
+    std::vector<std::size_t> histo(std::ranges::max(basin_map), 0);
+    for (int i : basin_map | std::views::filter([](int i) { return i > 0; }))
+      histo[static_cast<std::size_t>(i - 1)]++;
+    return histo;
+  }
+
+  auto product_of_top_3(std::span<std::size_t const> data) -> std::size_t {
+    std::array<std::size_t, 3> top_3{};
+    std::ranges::partial_sort_copy(data, top_3, std::greater<>{});
+    return std::accumulate(top_3.begin(), top_3.end(), 1ul, std::multiplies<>{});
+  }
+
 }// namespace Day09
 
 namespace AoC {
@@ -75,6 +116,10 @@ namespace AoC {
 
   auto Solution<9>::part1() const -> std::size_t {
     return Day09::total_risk_level(elevations_view);
+  }
+
+  auto Solution<9>::part2() const -> std::size_t {
+    return Day09::product_of_top_3(Day09::histogrammize(Day09::basin_map(elevations_view)));
   }
 
 }// namespace AoC

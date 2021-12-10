@@ -25,10 +25,19 @@ constexpr std::array<int, 10*5> EXAMPLE_ELEVATIONS = {
         8,7,6,7,8,9,6,7,8,9,
         9,8,9,9,9,6,5,6,7,8,
 };
+
+constexpr std::array<int, 10*5> EXAMPLE_BASINS = {
+        1,1,0,0,0,2,2,2,2,2,
+        1,0,3,3,3,0,2,0,2,2,
+        0,3,3,3,3,3,0,4,0,2,
+        3,3,3,3,3,0,4,4,4,0,
+        0,3,0,0,0,4,4,4,4,4,
+};
 // clang-format on
 
-constexpr ElevationConstView EXAMPLE_ELEVATIONS_VIEW{EXAMPLE_ELEVATIONS.data(),
-                                                     Dyn2DExtents{5, 10}};
+constexpr Dyn2DExtents EXAMPLE_EXTENTS{5, 10};
+constexpr ElevationConstView EXAMPLE_ELEVATIONS_VIEW{EXAMPLE_ELEVATIONS.data(), EXAMPLE_EXTENTS};
+constexpr ElevationConstView EXAMPLE_BASINS_VIEW{EXAMPLE_BASINS.data(), EXAMPLE_EXTENTS};
 
 TEST(Day09, parse_input) {
   std::stringstream stream{std::string{EXAMPLE_ELEVATION_STRING}};
@@ -72,4 +81,24 @@ TEST(Day09, number_of_local_minima) {
 
 TEST(Day09, total_risk_level) {
   EXPECT_EQ(total_risk_level(EXAMPLE_ELEVATIONS_VIEW), 15);
+}
+
+TEST(Day09, basin_map) {
+  using ::testing::ElementsAreArray;
+  auto basin_data = basin_map(EXAMPLE_ELEVATIONS_VIEW);
+  EXPECT_THAT(basin_data, ElementsAreArray(EXAMPLE_BASINS));
+}
+
+TEST(Day09, histogrammize) {
+  using ::testing::UnorderedElementsAre;
+  EXPECT_THAT(histogrammize(EXAMPLE_BASINS), UnorderedElementsAre(3ul, 9ul, 9ul, 14ul));
+}
+
+TEST(Day09, product_of_top_3) {
+  EXPECT_EQ(product_of_top_3(std::array{1ul, 2ul}), 0ul);
+  EXPECT_EQ(product_of_top_3(std::array{1ul, 2ul, 3ul}), 6ul);
+  EXPECT_EQ(product_of_top_3(std::array{1ul, 2ul, 3ul, 4ul}), 24ul);
+  EXPECT_EQ(product_of_top_3(std::array{1ul, 2ul, 3ul, 4ul, 5ul}), 60ul);
+  EXPECT_EQ(product_of_top_3(std::array{5ul, 3ul, 4ul, 1ul, 2ul}), 60ul);
+  EXPECT_EQ(product_of_top_3(std::array{3ul, 9ul, 9ul, 14ul}), 1134ul);
 }
