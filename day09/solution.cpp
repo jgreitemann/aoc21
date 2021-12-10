@@ -63,27 +63,25 @@ namespace Day09 {
   }
 
   auto basin_map(ElevationConstView map) -> std::vector<int> {
-    std::vector<int> basins(map.size(), -1);
+    std::vector<int> basins(map.size(), 0);
     ElevationView basins_map{basins.data(), map.extents()};
 
-    int next_basin = 1;
-    for (Point p : all_points(map.extents())) {
-      if (map(p.x, p.y) == 9) {
-        basins_map(p.x, p.y) = 0;
-      } else {
-        if (basins_map(p.x, p.y) == -1) {
-          if (auto adj_basin = std::ranges::max(surrounding_points(p, map.extents())
-                                                | std::views::transform([basins_map](Point q) {
-                                                    return basins_map(q.x, q.y);
-                                                  }));
-              adj_basin > 0)
-            basins_map(p.x, p.y) = adj_basin;
-          else
-            basins_map(p.x, p.y) = next_basin++;
-        }
-        for (Point q : surrounding_points(p, map.extents())
-                               | std::views::filter([map](Point q) { return map(q.x, q.y) < 9; }))
-          basins_map(q.x, q.y) = basins_map(p.x, p.y);
+    // Assign basin seed values to local minima
+    std::ranges::generate(all_points(map.extents()) | std::views::filter([map](Point p) {
+                            return is_local_minimum(map, p);
+                          }) | std::views::transform([basins_map](Point p) -> int & {
+                            return basins_map(p.x, p.y);
+                          }),
+                          [next_basin = 1]() mutable { return next_basin++; });
+
+    // Successively grow basins, level-by-level
+    for (int level : std::views::iota(1, 9)) {
+      for (Point p : all_points(map.extents()) | std::views::filter([map, level](Point p) {
+                       return map(p.x, p.y) == level && !is_local_minimum(map, p);
+                     })) {
+        basins_map(p.x, p.y) = std::ranges::max(
+                surrounding_points(p, map.extents())
+                | std::views::transform([basins_map](Point q) { return basins_map(q.x, q.y); }));
       }
     }
 
