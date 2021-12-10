@@ -89,6 +89,15 @@ TEST(Day09, basin_map) {
   EXPECT_THAT(basin_data, ElementsAreArray(EXAMPLE_BASINS));
 }
 
+TEST(Day09, basin_map_watershed) {
+  using ::testing::ElementsAreArray;
+  std::array watershed_elevations = {1, 2, 4, 4, 3, 2};
+  ElevationConstView watershed_elevations_view{watershed_elevations.data(), Dyn2DExtents{1, 6}};
+  std::array watershed_basins = {1, 1, 1, 2, 2, 2};
+  auto basin_data = basin_map(watershed_elevations_view);
+  EXPECT_THAT(basin_data, ElementsAreArray(watershed_basins));
+}
+
 TEST(Day09, histogrammize) {
   using ::testing::UnorderedElementsAre;
   EXPECT_THAT(histogrammize(EXAMPLE_BASINS), UnorderedElementsAre(3ul, 9ul, 9ul, 14ul));
