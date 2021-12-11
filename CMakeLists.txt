@@ -58,6 +58,7 @@ gtest_discover_tests(aoc21-test)
 target_link_libraries(aoc21-test
     PRIVATE
         solutions
+        fmt::fmt
         GTest::GTest
         rangesnext
 )
