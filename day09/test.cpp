@@ -41,7 +41,7 @@ constexpr ElevationConstView EXAMPLE_BASINS_VIEW{EXAMPLE_BASINS.data(), EXAMPLE_
 
 TEST(Day09, parse_input) {
   std::stringstream stream{std::string{EXAMPLE_ELEVATION_STRING}};
-  auto [elevations, view] = Day09::parse(stream);
+  auto [elevations, view] = AoC::parse_matrix(stream);
 
   using ::testing::ElementsAreArray;
   EXPECT_THAT(elevations, ElementsAreArray(EXAMPLE_ELEVATIONS));
@@ -51,15 +51,15 @@ TEST(Day09, parse_input) {
   EXPECT_EQ(view(4, 9), 8);
 }
 
-TEST(Day09, surrounding_points) {
+TEST(Day09, neighboring_points) {
   using cor3ntin::rangesnext::to;
   using ::testing::UnorderedElementsAre;
   constexpr auto ext = EXAMPLE_ELEVATIONS_VIEW.extents();
-  EXPECT_THAT(surrounding_points(Point{0, 0}, ext) | to<std::vector>(),
+  EXPECT_THAT(neighboring_points(Point{0, 0}, ext) | to<std::vector>(),
               UnorderedElementsAre(Point{0, 1}, Point{1, 0}));
-  EXPECT_THAT(surrounding_points(Point{2, 4}, ext) | to<std::vector>(),
+  EXPECT_THAT(neighboring_points(Point{2, 4}, ext) | to<std::vector>(),
               UnorderedElementsAre(Point{3, 4}, Point{1, 4}, Point{2, 3}, Point{2, 5}));
-  EXPECT_THAT(surrounding_points(Point{4, 5}, ext) | to<std::vector>(),
+  EXPECT_THAT(neighboring_points(Point{4, 5}, ext) | to<std::vector>(),
               UnorderedElementsAre(Point{4, 4}, Point{4, 6}, Point{3, 5}));
 }
 
