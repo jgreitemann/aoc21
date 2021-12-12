@@ -105,13 +105,13 @@ TEST(Day12, parse_input) {
   test(LARGE_EXAMPLE_INPUT, LARGE_EXAMPLE_GRAPH);
 }
 
-TEST(Day12, small_example_traversals) {
+TEST(Day12, small_example_traversals_without_freebie) {
   using cor3ntin::rangesnext::to;
   using ::testing::ElementsAre;
   using ::testing::UnorderedElementsAre;
-  Graph graph(SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end());
+  auto graph = directed_graph(Graph{SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end()});
   EXPECT_THAT(
-          traversals(graph) | to<std::vector>(),
+          traversals(graph, false) | to<std::vector>(),
           UnorderedElementsAre(ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
                                ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "end"sv),
                                ElementsAre("start"sv, "A"sv, "b"sv, "end"sv),
@@ -124,12 +124,12 @@ TEST(Day12, small_example_traversals) {
                                ElementsAre("start"sv, "b"sv, "end"sv)));
 }
 
-TEST(Day12, medium_example_traversals) {
+TEST(Day12, medium_example_traversals_without_freebie) {
   using cor3ntin::rangesnext::to;
   using ::testing::ElementsAre;
   using ::testing::UnorderedElementsAre;
-  Graph graph(MEDIUM_EXAMPLE_GRAPH.begin(), MEDIUM_EXAMPLE_GRAPH.end());
-  EXPECT_THAT(traversals(graph) | to<std::vector>(),
+  auto graph = directed_graph(Graph{MEDIUM_EXAMPLE_GRAPH.begin(), MEDIUM_EXAMPLE_GRAPH.end()});
+  EXPECT_THAT(traversals(graph, false) | to<std::vector>(),
               UnorderedElementsAre(
                       ElementsAre("start"sv, "HN"sv, "dc"sv, "HN"sv, "end"sv),
                       ElementsAre("start"sv, "HN"sv, "dc"sv, "HN"sv, "kj"sv, "HN"sv, "end"sv),
@@ -152,11 +152,78 @@ TEST(Day12, medium_example_traversals) {
                       ElementsAre("start"sv, "kj"sv, "dc"sv, "end"sv)));
 }
 
-TEST(Day12, number_of_traversals) {
-  EXPECT_EQ(number_of_traversals(Graph{SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end()}),
+TEST(Day12, number_of_traversals_without_freebie) {
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end()}),
+                    false),
             10);
-  EXPECT_EQ(number_of_traversals(Graph{MEDIUM_EXAMPLE_GRAPH.begin(), MEDIUM_EXAMPLE_GRAPH.end()}),
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{MEDIUM_EXAMPLE_GRAPH.begin(), MEDIUM_EXAMPLE_GRAPH.end()}),
+                    false),
             19);
-  EXPECT_EQ(number_of_traversals(Graph{LARGE_EXAMPLE_GRAPH.begin(), LARGE_EXAMPLE_GRAPH.end()}),
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{LARGE_EXAMPLE_GRAPH.begin(), LARGE_EXAMPLE_GRAPH.end()}),
+                    false),
             226);
+}
+
+TEST(Day12, small_example_traversals_with_freebie) {
+  using cor3ntin::rangesnext::to;
+  using ::testing::ElementsAre;
+  using ::testing::UnorderedElementsAre;
+  auto graph = directed_graph(Graph{SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end()});
+  EXPECT_THAT(
+          traversals(graph, true) | to<std::vector>(),
+          UnorderedElementsAre(
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "d"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "d"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "d"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "d"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "d"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "c"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "c"sv, "A"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "c"sv, "A"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "c"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "d"sv, "b"sv, "A"sv, "c"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "d"sv, "b"sv, "A"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "d"sv, "b"sv, "end"sv),
+                  ElementsAre("start"sv, "b"sv, "end"sv)));
+}
+
+TEST(Day12, number_of_traversals_with_freebie) {
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{SMALL_EXAMPLE_GRAPH.begin(), SMALL_EXAMPLE_GRAPH.end()}),
+                    true),
+            36);
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{MEDIUM_EXAMPLE_GRAPH.begin(), MEDIUM_EXAMPLE_GRAPH.end()}),
+                    true),
+            103);
+  EXPECT_EQ(number_of_traversals(
+                    directed_graph(Graph{LARGE_EXAMPLE_GRAPH.begin(), LARGE_EXAMPLE_GRAPH.end()}),
+                    true),
+            3509);
 }
