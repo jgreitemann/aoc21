@@ -32,6 +32,7 @@ namespace Day13 {
   auto parse_instructions(std::span<std::string const> lines) -> std::vector<FoldInstruction>;
   auto fold(std::span<Point const> dots, std::span<FoldInstruction const> instructions)
           -> std::vector<Point>;
+  auto render(std::span<Point const> dots) -> std::string;
 
 }// namespace Day13
 
@@ -41,6 +42,7 @@ namespace AoC {
   struct Solution<13> {
     explicit Solution(std::istream &);
     auto part1() const -> std::size_t;
+    auto part2() const -> std::string;
 
   private:
     explicit Solution(std::vector<Day13::Point> &&dots,

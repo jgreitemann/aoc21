@@ -55,6 +55,16 @@ namespace Day13 {
     return folded;
   }
 
+  auto render(std::span<Point const> dots) -> std::string {
+    auto max_x = std::ranges::max(dots | std::views::transform(&Point::x));
+    auto max_y = std::ranges::max(dots | std::views::transform(&Point::y));
+    auto display = std::vector(max_y + 1, std::string(max_x + 1, '.') + "\n");
+    for (auto dot : dots) {
+      display[dot.y][dot.x] = '#';
+    }
+    return std::accumulate(display.begin(), display.end(), std::string{"\n"});
+  }
+
 }// namespace Day13
 
 namespace AoC {
@@ -75,6 +85,10 @@ namespace AoC {
 
   auto Solution<13>::part1() const -> std::size_t {
     return Day13::fold(dots, std::array{instructions.front()}).size();
+  }
+
+  auto Solution<13>::part2() const -> std::string {
+    return Day13::render(Day13::fold(dots, instructions));
   }
 
 }// namespace AoC

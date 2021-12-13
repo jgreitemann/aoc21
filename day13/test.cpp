@@ -52,6 +52,14 @@ constexpr std::array EXAMPLE_DOTS_AFTER_2ND_FOLD = {
 constexpr std::array EXAMPLE_INSTRUCTIONS = {FoldInstruction{FoldDirection::Up, 7},
                                              FoldInstruction{FoldDirection::Left, 5}};
 
+constexpr std::string_view EXAMPLE_RENDERED = R"(
+#####
+#...#
+#...#
+#...#
+#####
+)";
+
 TEST(Day13, parse_input) {
   using cor3ntin::rangesnext::to;
   std::stringstream stream{std::string{EXAMPLE_INPUT}};
@@ -72,4 +80,8 @@ TEST(Day13, dots_after_fold) {
 
   EXPECT_THAT(fold(EXAMPLE_DOTS, EXAMPLE_INSTRUCTIONS),
               UnorderedElementsAreArray(EXAMPLE_DOTS_AFTER_2ND_FOLD));
+}
+
+TEST(Day13, render) {
+  EXPECT_EQ(render(fold(EXAMPLE_DOTS, EXAMPLE_INSTRUCTIONS)), EXAMPLE_RENDERED);
 }
