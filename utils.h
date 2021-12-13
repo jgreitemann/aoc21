@@ -85,7 +85,7 @@ namespace AoC {
       y /= p.y;
       return *this;
     }
-    constexpr bool operator==(Point const &) const noexcept = default;
+    constexpr auto operator<=>(Point const &) const noexcept = default;
     [[nodiscard]] constexpr Point abs() const { return {std::abs(x), std::abs(y)}; }
     [[nodiscard]] constexpr int norm1() const { return std::max(std::abs(x), std::abs(y)); }
   };
