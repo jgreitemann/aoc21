@@ -70,3 +70,19 @@ TEST(Day14, polymer_histogram) {
 
   EXPECT_EQ(minmax_diff(histogram), 1588);
 }
+
+TEST(Day14, compressed_polymer_representation_yields_identical_histogram) {
+  std::string polymer{EXAMPLE_POLYMER_TEMPLATE};
+  EXPECT_EQ(CompressedPolymer{polymer}.histogram(), histogrammize(polymer));
+
+  auto reacted_polymer = chain_react(polymer, EXAMPLE_RULES, 10);
+  EXPECT_EQ(CompressedPolymer{reacted_polymer}.histogram(), histogrammize(reacted_polymer));
+}
+
+TEST(Day14, compressed_polymer_representation_reacts_identically_to_the_plain_one) {
+  std::string polymer{EXAMPLE_POLYMER_TEMPLATE};
+  auto reacted_polymer = chain_react(polymer, EXAMPLE_RULES, 10);
+
+  EXPECT_EQ(chain_react(CompressedPolymer{polymer}, EXAMPLE_RULES, 10).histogram(),
+            histogrammize(reacted_polymer));
+}

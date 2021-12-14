@@ -45,10 +45,8 @@ namespace Day14 {
     return polymer;
   }
 
-  auto chain_react(std::string polymer, std::span<Rule const> rules, std::size_t times)
-          -> std::string {
-    for (auto _ : std::views::iota(0ul, times))
-      polymer = react(std::move(polymer), rules);
+  auto react(CompressedPolymer polymer, std::span<Rule const> rules) -> CompressedPolymer {
+    polymer.react(rules);
     return polymer;
   }
 
@@ -67,6 +65,41 @@ namespace Day14 {
     return max - min;
   }
 
+  CompressedPolymer::CompressedPolymer(std::string_view polymer)
+      : start{polymer.front()}
+      , end{polymer.back()} {
+    std::multiset<std::array<char, 2>> seqs;
+    std::transform(polymer.begin(), polymer.end() - 1, polymer.begin() + 1,
+                   std::inserter(seqs, seqs.end()), [](char a, char b) {
+                     return std::array{a, b};
+                   });
+    for (auto it = seqs.begin(); it != seqs.end(); it = seqs.upper_bound(*it))
+      seq_histo.emplace(*it, seqs.count(*it));
+  }
+
+  auto CompressedPolymer::histogram() const -> std::unordered_map<char, std::size_t> {
+    auto histo = std::unordered_map<char, std::size_t>{};
+    for (auto [seq, count] : seq_histo) {
+      histo[seq[0]] += count;
+      histo[seq[1]] += count;
+    }
+    histo[start]++;
+    histo[end]++;
+    for (auto &[c, count] : histo)
+      count /= 2;
+    return histo;
+  }
+
+  void CompressedPolymer::react(std::span<const Rule> rules) {
+    std::unordered_map<std::array<char, 2>, std::size_t> new_seq_histo;
+    for (auto const &[seq, count] : seq_histo) {
+      auto insertion = std::ranges::find(rules, seq, &Rule::seq)->snippet;
+      new_seq_histo[std::array{seq[0], insertion}] += count;
+      new_seq_histo[std::array{insertion, seq[1]}] += count;
+    }
+    seq_histo = std::move(new_seq_histo);
+  }
+
 }// namespace Day14
 
 namespace AoC {
@@ -83,6 +116,11 @@ namespace AoC {
   auto Solution<14>::part1() const -> std::size_t {
     return Day14::minmax_diff(
             Day14::histogrammize(Day14::chain_react(polymer_template, rules, 10)));
+  }
+
+  auto Solution<14>::part2() const -> std::size_t {
+    return Day14::minmax_diff(
+            Day14::chain_react(Day14::CompressedPolymer{polymer_template}, rules, 40).histogram());
   }
 
 }// namespace AoC
