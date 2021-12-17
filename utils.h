@@ -167,4 +167,42 @@ namespace AoC {
       co_yield Point{center.x + 1, center.y - 1};
   }
 
+  template <std::size_t N, typename R>
+  auto chunks(R &&rng) -> cor3ntin::rangesnext::generator<
+          std::array<typename std::remove_reference_t<R>::value_type, N>>
+  requires std::ranges::input_range<std::remove_reference_t<R>> {
+    std::array<typename std::remove_reference_t<R>::value_type, N> chunk;
+    auto it = rng.begin();
+    auto const end = rng.end();
+    while (true) {
+      auto output_it =
+              std::ranges::copy(std::ranges::subrange{it, end} | std::views::take(N), chunk);
+      if (output_it != chunk.end())
+        break;
+      std::advance(it, N);
+      co_yield chunk;
+    }
+  }
+
+  template <std::size_t N, typename InputIt>
+  auto chunks(InputIt &&it) -> cor3ntin::rangesnext::generator<std::array<
+          typename std::iterator_traits<std::remove_reference_t<InputIt>>::value_type, N>>
+  requires std::input_iterator<std::remove_reference_t<InputIt>> {
+    std::array<typename std::iterator_traits<std::remove_reference_t<InputIt>>::value_type, N>
+            chunk;
+    while (true) {
+      std::ranges::copy_n(it, N, chunk.begin());
+      std::advance(it, N);
+      co_yield chunk;
+    }
+  }
+
+  template <typename T, std::ranges::input_range R,
+            std::invocable<T, typename std::remove_reference_t<R>::value_type> F>
+  auto accumulate(R &&rng, T &&init, F &&f) -> std::remove_reference_t<T> {
+    auto common = rng | std::views::common;
+    return std::accumulate(common.begin(), common.end(), std::forward<T>(init), std::forward<F>(f));
+  }
+
+
 }// namespace AoC
