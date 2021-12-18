@@ -198,7 +198,7 @@ namespace AoC {
   }
 
   template <typename T, std::ranges::input_range R,
-            std::invocable<T, typename std::remove_reference_t<R>::value_type> F>
+            std::invocable<T, decltype(*std::begin(std::declval<R>()))> F>
   auto accumulate(R &&rng, T &&init, F &&f) -> std::remove_reference_t<T> {
     auto common = rng | std::views::common;
     return std::accumulate(common.begin(), common.end(), std::forward<T>(init), std::forward<F>(f));

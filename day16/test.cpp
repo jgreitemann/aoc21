@@ -56,7 +56,7 @@ TEST(Day16, literal_packet_is_decoded) {
 TEST(Day16, operator_packet_with_length_type_0_is_decoded) {
   auto packet = Packet{EXAMPLE_OPERATOR_LEN0_BINARY.begin()};
   EXPECT_EQ(packet.version, 1);
-  auto const &subpackets = std::get<OperatorPayload>(packet.payload).subpackets;
+  auto const &subpackets = std::get<OperatorPayload<std::less<>>>(packet.payload).subpackets;
   EXPECT_THAT(subpackets, ::testing::SizeIs(2));
   EXPECT_EQ(subpackets[0].version, 6);
   EXPECT_EQ(std::get<LiteralPayload>(subpackets[0].payload).number, 10);
@@ -67,7 +67,7 @@ TEST(Day16, operator_packet_with_length_type_0_is_decoded) {
 TEST(Day16, operator_packet_with_length_type_1_is_decoded) {
   auto packet = Packet{EXAMPLE_OPERATOR_LEN1_BINARY.begin()};
   EXPECT_EQ(packet.version, 7);
-  auto const &subpackets = std::get<OperatorPayload>(packet.payload).subpackets;
+  auto const &subpackets = std::get<OperatorPayload<maximum>>(packet.payload).subpackets;
   EXPECT_THAT(subpackets, ::testing::SizeIs(3));
   EXPECT_EQ(subpackets[0].version, 2);
   EXPECT_EQ(std::get<LiteralPayload>(subpackets[0].payload).number, 1);
@@ -87,14 +87,17 @@ TEST(Day16, more_examples_are_decoded) {
   };
 
   test(ANOTHER_EXAMPLE_1_HEX,
-       Packet{4, OperatorPayload{{Packet{
-                         1, OperatorPayload{{Packet{
-                                    5, OperatorPayload{{Packet{6, LiteralPayload{15}}}}}}}}}}});
+       Packet{4, OperatorPayload<minimum>{
+                         {Packet{1, OperatorPayload<minimum>{
+                                            {Packet{5, OperatorPayload<minimum>{{Packet{
+                                                               6, LiteralPayload{15}}}}}}}}}}});
   test(ANOTHER_EXAMPLE_2_HEX,
-       Packet{3, OperatorPayload{{Packet{0, OperatorPayload{{Packet{0, LiteralPayload{10}},
-                                                             Packet{5, LiteralPayload{11}}}}},
-                                  Packet{1, OperatorPayload{{Packet{0, LiteralPayload{12}},
-                                                             Packet{3, LiteralPayload{13}}}}}}}});
+       Packet{3,
+              OperatorPayload<std::plus<>>{
+                      {Packet{0, OperatorPayload<std::plus<>>{{Packet{0, LiteralPayload{10}},
+                                                               Packet{5, LiteralPayload{11}}}}},
+                       Packet{1, OperatorPayload<std::plus<>>{{Packet{0, LiteralPayload{12}},
+                                                               Packet{3, LiteralPayload{13}}}}}}}});
 }
 
 TEST(Day16, version_sums) {
@@ -110,4 +113,23 @@ TEST(Day16, version_sums) {
   test(ANOTHER_EXAMPLE_2_HEX, 12);
   test(ANOTHER_EXAMPLE_3_HEX, 23);
   test(ANOTHER_EXAMPLE_4_HEX, 31);
+}
+
+TEST(Day16, evaluation) {
+  auto test = [](std::string_view hex, std::size_t expected_value) {
+    using cor3ntin::rangesnext::to;
+    std::stringstream stream{std::string{hex}};
+    auto bits = Day16::bits_from_hex_stream(stream) | to<std::vector>();
+    auto actual = Packet{bits.begin()};
+    EXPECT_EQ(actual.eval(), expected_value);
+  };
+
+  test("C200B40A82", 3);
+  test("04005AC33890", 54);
+  test("880086C3E88112", 7);
+  test("CE00C43D881120", 9);
+  test("D8005AC2A8F0", 1);
+  test("F600BC2D8F", 0);
+  test("9C005AC2F8F0", 0);
+  test("9C0141080250320F1802104A08", 1);
 }

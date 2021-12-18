@@ -49,17 +49,7 @@ namespace Day16 {
   }
 
   std::ostream &operator<<(std::ostream &os, const LiteralPayload &literal) {
-    return os << "Literal(" << literal.number << ')';
-  }
-
-  std::ostream &operator<<(std::ostream &os, const OperatorPayload &op) {
-    os << "Operator[";
-    if (!op.subpackets.empty()) {
-      os << op.subpackets.front();
-      for (auto const &x : std::ranges::subrange{op.subpackets.begin() + 1, op.subpackets.end()})
-        os << ", " << x;
-    }
-    return os << "]";
+    return os << literal.number;
   }
 
   std::ostream &operator<<(std::ostream &os, const Packet &p) {
@@ -68,24 +58,35 @@ namespace Day16 {
     return os;
   }
 
-  OperatorPayload::OperatorPayload(std::vector<Packet> subpackets)
-      : subpackets{std::move(subpackets)} {}
-
   Packet::Packet(std::uint8_t version, Packet::PayloadVariant payload)
       : version{version}
       , payload{std::move(payload)} {}
 
   auto Packet::version_sum() const -> std::size_t {
     return version
-           + std::visit(AoC::overload{[](LiteralPayload const &) { return 0ul; },
-                                      [](OperatorPayload const &payload) {
-                                        return AoC::accumulate(
-                                                payload.subpackets, 0ul,
-                                                [](std::size_t acc, Packet const &p) {
-                                                  return acc + p.version_sum();
-                                                });
-                                      }},
-                        payload);
+           + std::visit(
+                   AoC::overload{[](LiteralPayload const &) { return 0ul; },
+                                 []<typename Operation>(OperatorPayload<Operation> const &payload) {
+                                   return AoC::accumulate(payload.subpackets, 0ul,
+                                                          [](std::size_t acc, Packet const &p) {
+                                                            return acc + p.version_sum();
+                                                          });
+                                 }},
+                   payload);
+  }
+
+  auto Packet::eval() const noexcept -> std::size_t {
+    return std::visit(
+            AoC::overload{[](LiteralPayload const &payload) { return payload.number; },
+                          []<typename Operation>(OperatorPayload<Operation> const &payload) {
+                            if (payload.subpackets.empty())
+                              return 0ul;
+                            return AoC::accumulate(
+                                    payload.subpackets | std::views::drop(1)
+                                            | std::views::transform(std::mem_fn(&Packet::eval)),
+                                    payload.subpackets.front().eval(), Operation{});
+                          }},
+            payload);
   }
 
 }// namespace Day16
@@ -100,5 +101,6 @@ namespace AoC {
       }()} {}
 
   auto Solution<16>::part1() const -> std::size_t { return root.version_sum(); }
+  auto Solution<16>::part2() const -> std::size_t { return root.eval(); }
 
 }// namespace AoC

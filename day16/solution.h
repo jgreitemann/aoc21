@@ -3,6 +3,7 @@
 #include "../solution.h"
 #include "../utils.h"
 
+#include <functional>
 #include <iterator>
 #include <span>
 #include <variant>
@@ -10,6 +11,20 @@
 #include <cor3ntin/rangesnext/generator.hpp>
 
 namespace Day16 {
+
+  struct minimum {
+    template <typename T>
+    constexpr auto operator()(T &&lhs, T &&rhs) const noexcept -> T {
+      return std::min(lhs, rhs);
+    }
+  };
+
+  struct maximum {
+    template <typename T>
+    constexpr auto operator()(T &&lhs, T &&rhs) const noexcept -> T {
+      return std::max(lhs, rhs);
+    }
+  };
 
   using BitsGenerator = cor3ntin::rangesnext::generator<std::uint8_t>;
 
@@ -48,9 +63,12 @@ namespace Day16 {
 
     bool operator==(LiteralPayload const &) const = default;
 
+    constexpr auto value() -> std::size_t { return number; }
+
     std::size_t number;
   };
 
+  template <std::invocable<std::size_t, std::size_t> Operation>
   struct OperatorPayload {
     template <typename InputIt>
     explicit OperatorPayload(
@@ -70,7 +88,9 @@ namespace Day16 {
           }
           return pkg;
         }()} {}
-    explicit OperatorPayload(std::vector<Packet> subpackets);
+
+    explicit OperatorPayload(std::vector<Packet> subpackets)
+        : subpackets{std::move(subpackets)} {}
 
     bool operator==(OperatorPayload const &) const = default;
 
@@ -78,15 +98,35 @@ namespace Day16 {
   };
 
   struct Packet {
-    using PayloadVariant = std::variant<LiteralPayload, OperatorPayload>;
+    using PayloadVariant =
+            std::variant<LiteralPayload, OperatorPayload<std::plus<>>,
+                         OperatorPayload<std::multiplies<>>, OperatorPayload<minimum>,
+                         OperatorPayload<maximum>, OperatorPayload<std::greater<>>,
+                         OperatorPayload<std::less<>>, OperatorPayload<std::equal_to<>>>;
 
     template <typename InputIt>
     explicit Packet(InputIt &&bits) requires std::input_iterator<std::remove_reference_t<InputIt>>
         : version{read_number(bits, 3)}, payload{[&]() -> PayloadVariant {
-          if (read_number(bits, 3) == 4)
-            return LiteralPayload{bits};
-          else
-            return OperatorPayload{bits};
+          switch (read_number(bits, 3)) {
+            case 0:
+              return OperatorPayload<std::plus<>>{bits};
+            case 1:
+              return OperatorPayload<std::multiplies<>>{bits};
+            case 2:
+              return OperatorPayload<minimum>{bits};
+            case 3:
+              return OperatorPayload<maximum>{bits};
+            case 4:
+              return LiteralPayload{bits};
+            case 5:
+              return OperatorPayload<std::greater<>>{bits};
+            case 6:
+              return OperatorPayload<std::less<>>{bits};
+            case 7:
+              return OperatorPayload<std::equal_to<>>{bits};
+            default:
+              throw std::runtime_error{"Unsupported packet type"};
+          }
         }()} {}
 
     Packet(std::uint8_t version, PayloadVariant payload);
@@ -95,15 +135,36 @@ namespace Day16 {
 
     auto version_sum() const -> std::size_t;
 
+    auto eval() const noexcept -> std::size_t;
+
     std::size_t version;
-    std::variant<LiteralPayload, OperatorPayload> payload;
+    PayloadVariant payload;
   };
+
+  constexpr auto operator_symbol(std::plus<>) noexcept -> std::string_view { return "+"; }
+  constexpr auto operator_symbol(std::multiplies<>) noexcept -> std::string_view { return "*"; }
+  constexpr auto operator_symbol(minimum) noexcept -> std::string_view { return "min"; }
+  constexpr auto operator_symbol(maximum) noexcept -> std::string_view { return "max"; }
+  constexpr auto operator_symbol(std::greater<>) noexcept -> std::string_view { return ">"; }
+  constexpr auto operator_symbol(std::less<>) noexcept -> std::string_view { return "<"; }
+  constexpr auto operator_symbol(std::equal_to<>) noexcept -> std::string_view { return "=="; }
 
   std::ostream &operator<<(std::ostream &os, LiteralPayload const &literal);
 
-  std::ostream &operator<<(std::ostream &os, OperatorPayload const &op);
-
   std::ostream &operator<<(std::ostream &os, Packet const &p);
+
+  template <typename Operation>
+  std::ostream &operator<<(std::ostream &os, OperatorPayload<Operation> const &op) {
+    os << "(";
+    if (!op.subpackets.empty()) {
+      os << op.subpackets.front();
+      for (auto const &x : std::ranges::subrange{op.subpackets.begin() + 1, op.subpackets.end()})
+        os << ' ' << operator_symbol(Operation{}) << ' ' << x;
+      if (op.subpackets.size() == 1)
+        os << '[' << operator_symbol(Operation{}) << ']';
+    }
+    return os << ")";
+  }
 
 
 }// namespace Day16
@@ -114,6 +175,7 @@ namespace AoC {
   struct Solution<16> {
     explicit Solution(std::istream &);
     auto part1() const -> std::size_t;
+    auto part2() const -> std::size_t;
 
   private:
     Day16::Packet root;
