@@ -118,4 +118,8 @@ namespace AoC {
     return Day18::magnitude(Day18::add_all(summands));
   }
 
+  auto Solution<18>::part2() const -> std::size_t {
+    return Day18::largest_magnitude_for_single_addition(summands);
+  }
+
 }// namespace AoC
