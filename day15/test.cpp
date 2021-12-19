@@ -33,6 +33,14 @@ constexpr std::array EXAMPLE_RISK_DATA = {
         19,21,30,29,30,31,37,40,38,39,
         21,24,25,26,35,35,39,44,46,40,
 };
+
+constexpr std::array EXAMPLE_REPL_ELEMS = {
+        8, 9, 1, 2, 3,
+        9, 1, 2, 3, 4,
+        1, 2, 3, 4, 5,
+        2, 3, 4, 5, 6,
+        3, 4, 5, 6, 7,
+};
 // clang-format on
 
 constexpr MapConstView EXAMPLE_MAP{EXAMPLE_MAP_DATA.data(), AoC::Dyn2DExtents{10, 10}};
@@ -40,4 +48,21 @@ constexpr MapConstView EXAMPLE_MAP{EXAMPLE_MAP_DATA.data(), AoC::Dyn2DExtents{10
 TEST(Day15, least_risk_level_map) {
   using ::testing::ElementsAreArray;
   EXPECT_THAT(least_risk_level_map(EXAMPLE_MAP), ElementsAreArray(EXAMPLE_RISK_DATA));
+}
+
+TEST(Day15, replicate_fivefold) {
+  auto [data, map] = replicate_fivefold(EXAMPLE_MAP);
+
+  EXPECT_EQ(map.extents(), (AoC::Dyn2DExtents{50, 50}));
+
+  MapConstView repl_elems_map{EXAMPLE_REPL_ELEMS.data(), AoC::Dyn2DExtents{5, 5}};
+  for (Point p : AoC::all_points(repl_elems_map.extents())) {
+    Point q = 10 * p + Point{1, 2};
+    EXPECT_EQ(map(q.x, q.y), repl_elems_map(p.x, p.y));
+  }
+}
+
+TEST(Day15, min_risk_path_on_replicated_map) {
+  auto [data, map] = replicate_fivefold(EXAMPLE_MAP);
+  EXPECT_EQ(least_risk_level_map(map).back(), 315);
 }

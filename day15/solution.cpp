@@ -34,6 +34,21 @@ namespace Day15 {
     return risks;
   }
 
+  auto replicate_fivefold(MapConstView map) -> std::pair<std::vector<int>, MapConstView> {
+    std::vector<int> new_data(map.size() * 25);
+    MapView new_map{new_data.data(), AoC::Dyn2DExtents{map.extent(0) * 5, map.extent(1) * 5}};
+    Point offset{map.extent(0), map.extent(1)};
+
+    for (Point p : AoC::all_points(map.extents())) {
+      for (Point q : AoC::all_points(AoC::Dyn2DExtents{5, 5})) {
+        auto r = p + q * offset;
+        new_map(r.x, r.y) = (map(p.x, p.y) + q.x + q.y - 1) % 9 + 1;
+      }
+    }
+
+    return {std::move(new_data), new_map};
+  }
+
 }// namespace Day15
 
 namespace AoC {
@@ -46,5 +61,10 @@ namespace AoC {
       , map{pair.second} {}
 
   auto Solution<15>::part1() const -> int { return Day15::least_risk_level_map(map).back(); }
+
+  auto Solution<15>::part2() const -> int {
+    auto [repl_data, repl_map] = Day15::replicate_fivefold(map);
+    return Day15::least_risk_level_map(repl_map).back();
+  }
 
 }// namespace AoC

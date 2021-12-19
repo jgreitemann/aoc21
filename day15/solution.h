@@ -13,6 +13,7 @@ namespace Day15 {
   using MapView = AoC::View2D<int>;
 
   auto least_risk_level_map(MapConstView map) -> std::vector<int>;
+  auto replicate_fivefold(MapConstView map) -> std::pair<std::vector<int>, MapConstView>;
 
 }// namespace Day15
 
@@ -22,6 +23,7 @@ namespace AoC {
   struct Solution<15> {
     explicit Solution(std::istream &);
     auto part1() const -> int;
+    auto part2() const -> int;
 
   private:
     explicit Solution(std::pair<std::vector<int>, Day15::MapConstView> pair);
