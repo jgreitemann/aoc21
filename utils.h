@@ -172,14 +172,10 @@ namespace AoC {
           std::array<typename std::remove_reference_t<R>::value_type, N>>
   requires std::ranges::input_range<std::remove_reference_t<R>> {
     std::array<typename std::remove_reference_t<R>::value_type, N> chunk;
-    auto it = rng.begin();
-    auto const end = rng.end();
-    while (true) {
-      auto output_it =
-              std::ranges::copy(std::ranges::subrange{it, end} | std::views::take(N), chunk);
-      if (output_it != chunk.end())
-        break;
-      std::advance(it, N);
+    std::ranges::subrange rest{rng};
+    while (rest.size() >= N) {
+      std::ranges::copy_n(rest.begin(), N, chunk.begin());
+      rest.advance(N);
       co_yield chunk;
     }
   }
