@@ -14,6 +14,7 @@ namespace Day22 {
 
     constexpr auto operator<=>(Cuboid const &) const noexcept = default;
     auto clip(Cuboid const &other) const noexcept -> Cuboid;
+    auto number_of_points() const noexcept -> std::size_t;
   };
 
   auto operator<<(std::ostream &os, Cuboid const &cuboid) -> std::ostream &;
@@ -33,17 +34,21 @@ namespace Day22 {
                    std::views::iota(cuboid.z_min, std::max(cuboid.z_min, cuboid.z_max + 1)));
   }
 
-  using RebootState = std::vector<Point3D>;
+  struct RebootState {
+    std::vector<Cuboid> pos;
+    std::vector<Cuboid> neg;
+  };
 
-  auto points(RebootState const& state) -> std::vector<Point3D>;
+  auto points(RebootState const &state) -> std::vector<Point3D>;
 
-  auto apply_reboot_step(RebootState const &state, RebootStep const &step) -> RebootState;
+  auto apply_reboot_step(RebootState state, RebootStep const &step) -> RebootState;
 
   auto reboot(std::ranges::input_range auto seq) -> RebootState {
     return AoC::accumulate(seq, RebootState{}, apply_reboot_step);
   }
 
-  auto number_of_points(RebootState const& state) -> std::size_t;
+  auto number_of_points(Cuboid const &cuboid) noexcept -> std::size_t;
+  auto number_of_points(RebootState const &state) -> std::size_t;
 
   constexpr inline Cuboid bounding_box{-50, 50, -50, 50, -50, 50};
   constexpr inline auto clipped = [](Cuboid const &box) {

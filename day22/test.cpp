@@ -138,6 +138,26 @@ TEST(Day22, reboot) {
               UnorderedElementsAreArray(SMALL_EXAMPLE_POINTS_AFTER_REBOOT));
 }
 
+TEST(Day22, apply_reboot_step) {
+  constexpr std::array seq = {
+          std::pair{true, Cuboid{0, 1, 0, 1, 0, 1}},  std::pair{true, Cuboid{2, 3, 2, 3, 2, 3}},
+          std::pair{true, Cuboid{2, 3, 2, 3, 2, 3}},  std::pair{false, Cuboid{1, 2, 1, 2, 1, 2}},
+          std::pair{false, Cuboid{1, 2, 1, 2, 1, 2}}, std::pair{true, Cuboid{1, 2, 1, 2, 1, 2}},
+  };
+  auto state = apply_reboot_step({}, seq[0]);
+  EXPECT_EQ(number_of_points(state), 8);
+  state = apply_reboot_step(std::move(state), seq[1]);
+  EXPECT_EQ(number_of_points(state), 16);
+  state = apply_reboot_step(std::move(state), seq[2]);
+  EXPECT_EQ(number_of_points(state), 16);
+  state = apply_reboot_step(std::move(state), seq[3]);
+  EXPECT_EQ(number_of_points(state), 14);
+  state = apply_reboot_step(std::move(state), seq[4]);
+  EXPECT_EQ(number_of_points(state), 14);
+  state = apply_reboot_step(std::move(state), seq[5]);
+  EXPECT_EQ(number_of_points(state), 22);
+}
+
 TEST(Day22, number_of_points_after_reboot) {
   EXPECT_EQ(number_of_points(reboot(SMALL_EXAMPLE_SEQ)), 39);
   EXPECT_EQ(number_of_points(reboot(LARGE_EXAMPLE_SEQ | clipped_steps(bounding_box))), 590784);

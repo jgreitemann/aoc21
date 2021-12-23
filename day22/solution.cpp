@@ -33,21 +33,49 @@ namespace Day22 {
            | to<std::vector>();
   }
 
-  auto points(RebootState const& state) -> std::vector<Point3D> {
+  auto points(RebootState const &state) -> std::vector<Point3D> {
+    auto points_from_vec = [](std::vector<Cuboid> const &vec) {
+      auto pts = AoC::accumulate(vec, std::vector<Point3D>{}, [](auto pts, Cuboid const &cuboid) {
+        std::ranges::copy(points(cuboid), std::back_inserter(pts));
+        return pts;
+      });
+      std::ranges::sort(pts);
+      return pts;
+    };
+    auto pos_points = points_from_vec(state.pos);
+    auto neg_points = points_from_vec(state.neg);
+    std::vector<Point3D> diff{};
+    std::ranges::set_difference(pos_points, neg_points, std::back_inserter(diff));
+    return diff;
+  }
+
+  auto apply_reboot_step(RebootState state, RebootStep const &step) -> RebootState {
+    using cor3ntin::rangesnext::to;
+    auto filter_non_empty =
+            std::views::filter([](auto const &c) { return number_of_points(c) > 0; });
+
+    auto const &[on, cuboid] = step;
+    auto new_neg = state.pos | clipped(cuboid) | filter_non_empty | to<std::vector>();
+    std::ranges::copy(state.neg | clipped(cuboid) | filter_non_empty,
+                      std::back_inserter(state.pos));
+    std::ranges::copy(new_neg, std::back_inserter(state.neg));
+    if (on)
+      state.pos.push_back(cuboid);
     return state;
   }
 
-  auto apply_reboot_step(RebootState const &state, RebootStep const &step) -> RebootState {
-    RebootState res;
-    auto const &[on, cuboid] = step;
-    if (on)
-      std::ranges::set_union(state, points(cuboid), std::back_inserter(res));
-    else
-      std::ranges::set_difference(state, points(cuboid), std::back_inserter(res));
-    return res;
+  auto number_of_points(Cuboid const &cuboid) noexcept -> std::size_t {
+    return static_cast<std::size_t>(std::max(0, cuboid.x_max - cuboid.x_min + 1))
+           * static_cast<std::size_t>(std::max(0, cuboid.y_max - cuboid.y_min + 1))
+           * static_cast<std::size_t>(std::max(0, cuboid.z_max - cuboid.z_min + 1));
   }
 
-  auto number_of_points(RebootState const &state) -> std::size_t { return state.size(); }
+  auto number_of_points(RebootState const &state) -> std::size_t {
+    auto to_number_of_points =
+            std::views::transform([](Cuboid const &c) { return number_of_points(c); });
+    return AoC::accumulate(state.pos | to_number_of_points, 0ul, std::plus<>{})
+           - AoC::accumulate(state.neg | to_number_of_points, 0ul, std::plus<>{});
+  }
 
 }// namespace Day22
 
