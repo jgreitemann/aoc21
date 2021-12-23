@@ -68,6 +68,7 @@ namespace AoC {
   struct Solution<22> {
     explicit Solution(std::istream &);
     auto part1() const -> std::size_t;
+    auto part2() const -> std::size_t;
 
   private:
     Day22::RebootSequence sequence;

@@ -89,4 +89,8 @@ namespace AoC {
             Day22::reboot(sequence | Day22::clipped_steps(Day22::bounding_box)));
   }
 
+  auto Solution<22>::part2() const -> std::size_t {
+    return Day22::number_of_points(Day22::reboot(sequence));
+  }
+
 }// namespace AoC
