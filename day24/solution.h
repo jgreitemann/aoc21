@@ -59,11 +59,13 @@ namespace Day24 {
 
   auto run(std::span<Instruction const> program, std::span<int const> input) -> Registers;
 
+  auto digitize(std::size_t number) -> std::vector<int>;
+
   auto as_number(std::span<int const> digits) -> std::size_t;
 
   template <std::size_t len>
-  auto generate_model_numbers() -> cor3ntin::rangesnext::generator<std::array<int, len>> {
-    constexpr std::array digits = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+  auto generate_model_numbers(std::span<int const> digits)
+          -> cor3ntin::rangesnext::generator<std::array<int, len>> {
     auto tuples = [&digits]<std::size_t... I>(std::index_sequence<I...>) {
       using cor3ntin::rangesnext::product;
       return product((I, digits)...);
@@ -77,6 +79,15 @@ namespace Day24 {
     }
   }
 
+  auto decompile(std::ostream &os, std::span<Instruction const> program) -> std::ostream &;
+
+  enum class ComputeMode {
+    Precomputed,
+    BruteForceEmulation,
+    BruteForceDecompiled,
+    BruteForceSimplified,
+  };
+
 }// namespace Day24
 
 namespace std {
@@ -89,8 +100,12 @@ namespace AoC {
   struct Solution<24> {
     explicit Solution(std::istream &);
     auto part1() const -> std::size_t;
+    auto part2() const -> std::size_t;
 
   private:
+    auto compute(std::span<int const> input) const -> int;
+
+    Day24::ComputeMode const mode;
     std::vector<Day24::Instruction> program;
   };
 

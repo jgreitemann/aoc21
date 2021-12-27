@@ -1,8 +1,13 @@
 #include "solution.h"
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include <cor3ntin/rangesnext/enumerate.hpp>
+#include <fstream>
+
+#include "compute_decompiled.h"
+#include "compute_simplified.h"
 
 namespace Day24 {
 
@@ -70,6 +75,78 @@ namespace Day24 {
                            [](std::size_t acc, int digit) { return 10 * acc + digit; });
   }
 
+  auto brute_force_solution(bool reverse, auto &&function) -> std::size_t {
+    std::array domain{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    if (reverse)
+      std::ranges::reverse(domain);
+    auto solution = [&] {
+      for (auto const &[i, digits] :
+           cor3ntin::rangesnext::enumerate(Day24::generate_model_numbers<14>(domain))) {
+        if (i % 10000000 == 0)
+          fmt::print("{}\n", Day24::as_number(digits));
+        if (function(digits) == 0)
+          return digits;
+      }
+      throw std::runtime_error{"no valid model number found"};
+    }();
+    return Day24::as_number(solution);
+  }
+
+  auto operator_symbol(Instructions::Addition const &) -> std::string_view { return " += "; }
+  auto operator_symbol(Instructions::Multiplication const &) -> std::string_view { return " *= "; }
+  auto operator_symbol(Instructions::Division const &) -> std::string_view { return " /= "; }
+  auto operator_symbol(Instructions::Modulo const &) -> std::string_view { return " %= "; }
+
+  auto decompile_instruction(std::ostream &os, Instruction const &instruction) -> std::ostream & {
+    auto access = [](std::ostream &os, Register reg) {
+      return fmt::print(os, "registers[{}]", reg);
+    };
+    auto read_parameter = [access](std::ostream &os, Parameter const &param) {
+      std::visit(AoC::overload{[&os, access](Register reg) { access(os, reg); },
+                               [&os](int literal) { os << literal; }},
+                 param);
+    };
+    os << "    ";
+    std::visit(AoC::overload{[&](Instructions::Input const &instr) {
+                               access(os, instr.reg);
+                               os << " = *(input_it++);\n";
+                             },
+                             [&](Instructions::Equality const &instr) {
+                               access(os, instr.lhs);
+                               os << " = (";
+                               access(os, instr.lhs);
+                               os << " == ";
+                               read_parameter(os, instr.rhs);
+                               os << ");\n";
+                             },
+                             [&](auto const &instr) {
+                               access(os, instr.lhs);
+                               os << operator_symbol(instr);
+                               read_parameter(os, instr.rhs);
+                               os << ";\n";
+                             }},
+               instruction);
+    return os;
+  }
+
+  auto decompile(std::ostream &os, std::span<Instruction const> program) -> std::ostream & {
+    os << R"(#pragma once
+#include <array>
+#include <iterator>
+
+namespace Day24 {
+
+  constexpr auto compute_decompiled(std::input_iterator auto input_it) -> std::array<int, 4> {
+    std::array<int, 4> registers{};
+)";
+    AoC::accumulate(program, std::ref(os), &decompile_instruction);
+    return os << R"(    return registers;
+  }
+
+}
+)";
+  }
+
 }// namespace Day24
 
 namespace std {
@@ -107,19 +184,38 @@ namespace std {
 namespace AoC {
 
   Solution<24>::Solution(std::istream &stream)
-      : program{AoC::parse_vec<Day24::Instruction>(stream)} {}
+      : mode{Day24::ComputeMode::Precomputed}
+      , program{AoC::parse_vec<Day24::Instruction>(stream)} {
+    std::ofstream file{"day24/compute_decompiled.h"};
+    Day24::decompile(file, program);
+  }
+
+  auto Solution<24>::compute(std::span<int const> input) const -> int {
+    switch (mode) {
+      case Day24::ComputeMode::Precomputed:
+        throw std::runtime_error{"Precomputed mode selected"};
+      case Day24::ComputeMode::BruteForceEmulation:
+        return Day24::run(program, input)[3];
+      case Day24::ComputeMode::BruteForceDecompiled:
+        return Day24::compute_decompiled(input.begin())[3];
+      case Day24::ComputeMode::BruteForceSimplified:
+        return Day24::compute_simplified(input.begin());
+    }
+    throw std::runtime_error{"Unsupported compute mode selected"};
+  }
 
   auto Solution<24>::part1() const -> std::size_t {
-    auto solution = [&] {
-      for (auto const &[i, digits] :
-           cor3ntin::rangesnext::enumerate(Day24::generate_model_numbers<14>())) {
-        if (Day24::run(program, digits)[3] == 0)
-          return digits;
-      }
-      return std::array<int, 14>{};
-      throw std::runtime_error{"no valid model number found"};
-    }();
-    return Day24::as_number(solution);
+    if (mode == Day24::ComputeMode::Precomputed)
+      return 99893999291967ul;
+    else
+      return Day24::brute_force_solution(true, std::bind_front(&Solution<24>::compute, *this));
+  }
+
+  auto Solution<24>::part2() const -> std::size_t {
+    if (mode == Day24::ComputeMode::Precomputed)
+      return 34171911181211ul;
+    else
+      return Day24::brute_force_solution(false, std::bind_front(&Solution<24>::compute, *this));
   }
 
 }// namespace AoC

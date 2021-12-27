@@ -60,6 +60,39 @@ constexpr std::array<Instruction, 11> EXAMPLE_PROG3 = {
         Instructions::Modulo{Register::W, 2},
 };
 
+constexpr std::string_view EXAMPLE_PROG3_DECOMPILED = R"(
+    std::array<int, 4> registers{};
+    registers[0] = *(input_it++);
+    registers[3] += registers[0];
+    registers[3] %= 2;
+    registers[0] /= 2;
+    registers[2] += registers[0];
+    registers[2] %= 2;
+    registers[0] /= 2;
+    registers[1] += registers[0];
+    registers[1] %= 2;
+    registers[0] /= 2;
+    registers[0] %= 2;
+    return registers;
+)";
+
+constexpr auto decompiled_example_program_3(std::input_iterator auto input_it)
+        -> std::array<int, 4> {
+  std::array<int, 4> registers{};
+  registers[0] = *(input_it++);
+  registers[3] += registers[0];
+  registers[3] %= 2;
+  registers[0] /= 2;
+  registers[2] += registers[0];
+  registers[2] %= 2;
+  registers[0] /= 2;
+  registers[1] += registers[0];
+  registers[1] %= 2;
+  registers[0] /= 2;
+  registers[0] %= 2;
+  return registers;
+}
+
 TEST(Day24, parse_program) {
   auto test = [](std::string_view input, std::span<Instruction const> expected) {
     using ::testing::ElementsAreArray;
@@ -101,6 +134,20 @@ TEST(Day24, generate_model_numbers) {
   std::ranges::sort(nums, std::greater<>{});
 
   using ::testing::ElementsAreArray;
-  EXPECT_THAT(generate_model_numbers<3>() | std::views::transform(&as_number) | to<std::vector>(),
+  EXPECT_THAT(generate_model_numbers<3>(std::array{9, 8, 7, 6, 5, 4, 3, 2, 1})
+                      | std::views::transform(&as_number) | to<std::vector>(),
               ElementsAreArray(nums));
+}
+
+TEST(Day24, program_can_be_decompiled) {
+  using ::testing::HasSubstr;
+  std::stringstream decompiled_output_stream;
+  decompile(decompiled_output_stream, EXAMPLE_PROG3);
+  EXPECT_THAT(decompiled_output_stream.str(), HasSubstr(EXAMPLE_PROG3_DECOMPILED));
+}
+
+TEST(Day24, decompiled_program_yields_identical_results_as_emulation) {
+  for (auto input : std::views::iota(0ul, 20ul) | std::views::transform(digitize)) {
+    EXPECT_EQ(run(EXAMPLE_PROG3, input), decompiled_example_program_3(input.begin()));
+  }
 }
