@@ -167,6 +167,14 @@ namespace AoC {
       co_yield Point{center.x + 1, center.y - 1};
   }
 
+  template <std::integral T>
+  auto nearby_points(Point<T> center, Dyn2DExtents ext)
+          -> cor3ntin::rangesnext::generator<Point<T>> {
+    co_yield center;
+    for (auto q : surrounding_points(center, ext))
+      co_yield q;
+  }
+
   template <std::size_t N, typename R>
   auto chunks(R &&rng) -> cor3ntin::rangesnext::generator<
           std::array<typename std::remove_reference_t<R>::value_type, N>>

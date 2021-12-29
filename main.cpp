@@ -18,6 +18,7 @@
 #include "day16/solution.h"
 #include "day17/solution.h"
 #include "day18/solution.h"
+#include "day20/solution.h"
 #include "day21/solution.h"
 #include "day22/solution.h"
 #include "day24/solution.h"
@@ -42,6 +43,7 @@ extern template struct AoC::Solution<15>;
 extern template struct AoC::Solution<16>;
 extern template struct AoC::Solution<17>;
 extern template struct AoC::Solution<18>;
+extern template struct AoC::Solution<20>;
 extern template struct AoC::Solution<21>;
 extern template struct AoC::Solution<22>;
 extern template struct AoC::Solution<24>;
