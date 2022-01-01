@@ -442,6 +442,21 @@ constexpr std::array ISOMETRIES = {
         },
 };
 
+TEST(Day19, manhattan_distance) {
+  EXPECT_EQ(manhattan({0, 0, 0}, {0, 0, 0}), 0);
+  EXPECT_EQ(manhattan({0, 0, 0}, {1, 2, 3}), 6);
+  EXPECT_EQ(manhattan({-1, -2, -3}, {1, 2, 3}), 12);
+  EXPECT_EQ(manhattan({1, 2, 3}, {-1, -2, -3}), 12);
+  EXPECT_EQ(manhattan({-1, 2, -3}, {1, -2, 3}), 12);
+}
+
+TEST(Day19, max_manhattan_distance) {
+  constexpr std::array points = {
+          Point{1, 5}, Point{3, 2}, Point{3, 8}, Point{6, 6}, Point{11, 9}, Point{12, 4},
+  };
+  EXPECT_EQ(max_manhattan_distance(points), 15);
+}
+
 TEST(Day19, parse_scanners) {
   using ::testing::ElementsAre;
   using ::testing::ElementsAreArray;
@@ -481,59 +496,90 @@ TEST(Day19, generate_some_orientations_of_example) {
 TEST(Day19, translations_small_example) {
   using cor3ntin::rangesnext::to;
   using ::testing::ElementsAre;
+  using ::testing::Pair;
   using ::testing::UnorderedElementsAre;
   EXPECT_THAT(translations(SMALL_EXAMPLE_SCANNER_0, SMALL_EXAMPLE_SCANNER_1) | to<std::vector>(),
-              UnorderedElementsAre(ElementsAre(Point{-1, -1}, Point{3, -2}, Point{2, 0}),
-                                   ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1}),
-                                   ElementsAre(Point{-2, 1}, Point{2, 0}, Point{1, 2}),
-                                   ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1}),
-                                   ElementsAre(Point{-9, 1}, Point{-5, 0}, Point{-6, 2}),
-                                   ElementsAre(Point{-6, 2}, Point{-2, 1}, Point{-3, 3}),
-                                   ElementsAre(Point{-4, -2}, Point{0, -3}, Point{-1, -1}),
-                                   ElementsAre(Point{-8, -1}, Point{-4, -2}, Point{-5, 0}),
-                                   ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1})));
+              UnorderedElementsAre(
+                      Pair(ElementsAre(Point{-1, -1}, Point{3, -2}, Point{2, 0}), Point{-1, -3}),
+                      Pair(ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1}), Point{-5, -2}),
+                      Pair(ElementsAre(Point{-2, 1}, Point{2, 0}, Point{1, 2}), Point{-2, -1}),
+                      Pair(ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1}), Point{-5, -2}),
+                      Pair(ElementsAre(Point{-9, 1}, Point{-5, 0}, Point{-6, 2}), Point{-9, -1}),
+                      Pair(ElementsAre(Point{-6, 2}, Point{-2, 1}, Point{-3, 3}), Point{-6, 0}),
+                      Pair(ElementsAre(Point{-4, -2}, Point{0, -3}, Point{-1, -1}), Point{-4, -4}),
+                      Pair(ElementsAre(Point{-8, -1}, Point{-4, -2}, Point{-5, 0}), Point{-8, -3}),
+                      Pair(ElementsAre(Point{-5, 0}, Point{-1, -1}, Point{-2, 1}), Point{-5, -2})));
   EXPECT_THAT(translations(SMALL_EXAMPLE_SCANNER_1, SMALL_EXAMPLE_SCANNER_0) | to<std::vector>(),
-              UnorderedElementsAre(ElementsAre(Point{0, 2}, Point{-4, 3}, Point{-1, 4}),
-                                   ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3}),
-                                   ElementsAre(Point{3, 3}, Point{-1, 4}, Point{2, 5}),
-                                   ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3}),
-                                   ElementsAre(Point{8, 0}, Point{4, 1}, Point{7, 2}),
-                                   ElementsAre(Point{7, 2}, Point{3, 3}, Point{6, 4}),
-                                   ElementsAre(Point{1, 0}, Point{-3, 1}, Point{0, 2}),
-                                   ElementsAre(Point{5, -1}, Point{1, 0}, Point{4, 1}),
-                                   ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3})));
+              UnorderedElementsAre(
+                      Pair(ElementsAre(Point{0, 2}, Point{-4, 3}, Point{-1, 4}), Point{1, 3}),
+                      Pair(ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3}), Point{5, 2}),
+                      Pair(ElementsAre(Point{3, 3}, Point{-1, 4}, Point{2, 5}), Point{4, 4}),
+                      Pair(ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3}), Point{5, 2}),
+                      Pair(ElementsAre(Point{8, 0}, Point{4, 1}, Point{7, 2}), Point{9, 1}),
+                      Pair(ElementsAre(Point{7, 2}, Point{3, 3}, Point{6, 4}), Point{8, 3}),
+                      Pair(ElementsAre(Point{1, 0}, Point{-3, 1}, Point{0, 2}), Point{2, 1}),
+                      Pair(ElementsAre(Point{5, -1}, Point{1, 0}, Point{4, 1}), Point{6, 0}),
+                      Pair(ElementsAre(Point{4, 1}, Point{0, 2}, Point{3, 3}), Point{5, 2})));
 }
 
 TEST(Day19, overlap_small_example) {
   using cor3ntin::rangesnext::to;
-  auto sorted_scanner_0 = SMALL_EXAMPLE_SCANNER_0 | to<std::vector>();
-  std::ranges::sort(sorted_scanner_0);
+  using ::testing::ElementsAre;
+  using ::testing::UnorderedElementsAreArray;
 
-  EXPECT_EQ(overlap(SMALL_EXAMPLE_SCANNER_1, sorted_scanner_0, 3), sorted_scanner_0);
+  ReconstructResult scanner_0_reference{SMALL_EXAMPLE_SCANNER_0 | to<std::vector>(), {Point{}}};
+  std::ranges::sort(scanner_0_reference.beacons);
+
+  auto result = overlap(SMALL_EXAMPLE_SCANNER_1, scanner_0_reference, 3);
+  ASSERT_TRUE(result.has_value());
+  EXPECT_THAT(result->beacons, UnorderedElementsAreArray(SMALL_EXAMPLE_SCANNER_0));
+  EXPECT_THAT(result->scanners, ElementsAre(Point{0, 0, 0}, Point{5, 2, 0}));
 }
 
-TEST(Day19, overlap_example) {
+TEST(Day19, overlap_example_beacon_positions) {
   using cor3ntin::rangesnext::to;
   using ::testing::IsSupersetOf;
-  auto sorted_scanner_0 = EXAMPLE_SCANNER_0 | to<std::vector>();
-  auto sorted_scanner_1 = EXAMPLE_SCANNER_1 | to<std::vector>();
-  std::ranges::sort(sorted_scanner_0);
-  std::ranges::sort(sorted_scanner_1);
+  ReconstructResult scanner_0_reference{EXAMPLE_SCANNER_0 | to<std::vector>(), {Point{}}};
+  ReconstructResult scanner_1_reference{EXAMPLE_SCANNER_1 | to<std::vector>(), {Point{}}};
+  std::ranges::sort(scanner_0_reference.beacons);
+  std::ranges::sort(scanner_1_reference.beacons);
 
-  auto overlap_0_and_1_relative_to_0 = overlap(EXAMPLE_SCANNER_1, sorted_scanner_0, 12);
-  ASSERT_TRUE(std::ranges::is_sorted(overlap_0_and_1_relative_to_0));
-  EXPECT_THAT(overlap_0_and_1_relative_to_0,
+  auto overlap_0_and_1_relative_to_0 = overlap(EXAMPLE_SCANNER_1, scanner_0_reference, 12);
+  ASSERT_TRUE(overlap_0_and_1_relative_to_0.has_value());
+  ASSERT_TRUE(std::ranges::is_sorted(overlap_0_and_1_relative_to_0->beacons));
+  EXPECT_THAT(overlap_0_and_1_relative_to_0->beacons,
               IsSupersetOf(EXAMPLE_OVERLAP_BETWEEN_SCANNERS_0_AND_1_RELATIVE_TO_SCANNER_0));
 
-  EXPECT_THAT(overlap(EXAMPLE_SCANNER_0, sorted_scanner_1, 12),
+  EXPECT_THAT(overlap(EXAMPLE_SCANNER_0, scanner_1_reference, 12).value().beacons,
               IsSupersetOf(EXAMPLE_OVERLAP_BETWEEN_SCANNERS_0_AND_1_RELATIVE_TO_SCANNER_1));
 
-  EXPECT_THAT(overlap(EXAMPLE_SCANNER_4, overlap_0_and_1_relative_to_0, 12),
+  EXPECT_THAT(overlap(EXAMPLE_SCANNER_4, *overlap_0_and_1_relative_to_0, 12).value().beacons,
               IsSupersetOf(EXAMPLE_OVERLAP_BETWEEN_SCANNERS_1_AND_4_RELATIVE_TO_SCANNER_0));
+}
+
+TEST(Day19, overlap_example_scanner_positions) {
+  using cor3ntin::rangesnext::to;
+  using ::testing::ElementsAre;
+  ReconstructResult scanner_0_reference{EXAMPLE_SCANNER_0 | to<std::vector>(), {Point{}}};
+  ReconstructResult scanner_1_reference{EXAMPLE_SCANNER_1 | to<std::vector>(), {Point{}}};
+  std::ranges::sort(scanner_0_reference.beacons);
+  std::ranges::sort(scanner_1_reference.beacons);
+
+  auto overlap_0_and_1_relative_to_0 = overlap(EXAMPLE_SCANNER_1, scanner_0_reference, 12);
+  ASSERT_TRUE(overlap_0_and_1_relative_to_0.has_value());
+  EXPECT_THAT(overlap_0_and_1_relative_to_0->scanners,
+              ElementsAre(Point{0, 0, 0}, Point{68, -1246, -43}));
+
+  EXPECT_THAT(overlap(EXAMPLE_SCANNER_0, scanner_1_reference, 12).value().scanners,
+              ElementsAre(Point{0, 0, 0}, Point{68, 1246, -43}));
+
+  EXPECT_THAT(overlap(EXAMPLE_SCANNER_4, *overlap_0_and_1_relative_to_0, 12).value().scanners,
+              ElementsAre(Point{0, 0, 0}, Point{68, -1246, -43}, Point{-20, -1133, 1061}));
 }
 
 TEST(Day19, reconstruct_points_from_example_scanner_data) {
   using ::testing::ElementsAreArray;
   auto reconstructed = reconstruct(EXAMPLE_SCANNERS, 12);
-  EXPECT_THAT(reconstructed, ElementsAreArray(EXAMPLE_BEACONS_RELATIVE_TO_SCANNER_0));
+  EXPECT_THAT(reconstructed.beacons, ElementsAreArray(EXAMPLE_BEACONS_RELATIVE_TO_SCANNER_0));
+  EXPECT_EQ(max_manhattan_distance(reconstructed.scanners), 3621);
 }

@@ -202,10 +202,19 @@ namespace AoC {
   }
 
   template <typename T, std::ranges::input_range R,
-            std::invocable<T, decltype(*std::begin(std::declval<R>()))> F>
+            std::invocable<T, std::ranges::range_value_t<R>> F>
   auto accumulate(R &&rng, T &&init, F &&f) -> std::remove_reference_t<T> {
     auto common = rng | std::views::common;
     return std::accumulate(common.begin(), common.end(), std::forward<T>(init), std::forward<F>(f));
+  }
+
+  template <std::ranges::input_range Rng>
+  auto pairs(Rng &&rng) -> cor3ntin::rangesnext::generator<
+          std::tuple<std::ranges::range_reference_t<Rng>, std::ranges::range_reference_t<Rng>>> {
+    auto end = rng.end();
+    for (auto lhs_it = rng.begin(); lhs_it != end; ++lhs_it)
+      for (auto rhs_it = lhs_it + 1; rhs_it != end; ++rhs_it)
+        co_yield std::tie(*lhs_it, *rhs_it);
   }
 
 
