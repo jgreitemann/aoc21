@@ -44,4 +44,13 @@ namespace AoC {
     return {std::move(data), {data.data(), Dyn2DExtents{data.size() / line_len, line_len}}};
   }
 
+  auto parse_char_image(std::istream &stream) -> std::pair<std::vector<char>, View2D<char>> {
+    using cor3ntin::rangesnext::to;
+    auto image_lines = lines(stream) | to<std::vector>();
+    auto data = image_lines | std::views::join | to<std::vector>();
+    return {std::move(data),
+            {data.data(), Dyn2DExtents{image_lines.size(), image_lines.front().size()}}};
+  }
+
+
 }// namespace AoC

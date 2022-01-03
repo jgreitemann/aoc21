@@ -65,8 +65,8 @@ constexpr Image2DConstView EXAMPLE_ENHANCED_TWICE_IMAGE_VIEW{
 TEST(Day20, parse_input) {
   std::stringstream stream{std::string{EXAMPLE_INPUT}};
   EXPECT_EQ(parse_kernel(stream), EXAMPLE_KERNEL);
-  auto [image_data, image_view] = parse_image(stream);
-  EXPECT_EQ(image_data, EXAMPLE_ORIGINAL_IMAGE_DATA);
+  auto [image_data, image_view] = AoC::parse_char_image(stream);
+  EXPECT_EQ(std::string(image_data.begin(), image_data.end()), EXAMPLE_ORIGINAL_IMAGE_DATA);
   EXPECT_EQ(image_view.extents(), EXAMPLE_ORIGINAL_IMAGE_VIEW.extents());
 }
 

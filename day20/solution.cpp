@@ -9,14 +9,6 @@ namespace Day20 {
     return kernel;
   }
 
-  auto parse_image(std::istream &stream) -> std::pair<std::string, Image2DView> {
-    using cor3ntin::rangesnext::to;
-    auto image_lines = AoC::lines(stream) | to<std::vector>();
-    auto data = image_lines | std::views::join | to<std::string>();
-    return {std::move(data),
-            {data.data(), AoC::Dyn2DExtents{image_lines.size(), image_lines.front().size()}}};
-  }
-
   auto resize_extents(AoC::Dyn2DExtents extents, std::ptrdiff_t by) -> AoC::Dyn2DExtents {
     return AoC::Dyn2DExtents{extents.extent(0) + 2 * by, extents.extent(1) + 2 * by};
   }
@@ -81,9 +73,10 @@ namespace Day20 {
 namespace AoC {
 
   Solution<20>::Solution(std::istream &stream)
-      : Solution{Day20::parse_kernel(stream), Day20::parse_image(stream)} {}
+      : Solution{Day20::parse_kernel(stream), AoC::parse_char_image(stream)} {}
 
-  Solution<20>::Solution(std::string &&kernel, std::pair<std::string, Day20::Image2DView> &&image)
+  Solution<20>::Solution(std::string &&kernel,
+                         std::pair<std::vector<char>, Day20::Image2DView> &&image)
       : kernel{std::move(kernel)}
       , original_data{std::move(image.first)}
       , original_image{image.second} {}

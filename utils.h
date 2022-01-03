@@ -32,6 +32,8 @@ namespace AoC {
 
   auto parse_matrix(std::istream &stream) -> std::pair<std::vector<int>, View2D<int const>>;
 
+  auto parse_char_image(std::istream &) -> std::pair<std::vector<char>, View2D<char>>;
+
   template <typename... Bases>
   struct overload : Bases... {
     using Bases::operator()...;
