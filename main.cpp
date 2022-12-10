@@ -69,6 +69,9 @@ void handle_all_days(std::integer_sequence<int, 0, Days...>) {
   (handle_day<AoC::Solution<Days>>(Days), ...);
 }
 
-int main() {
+int main() try {
   handle_all_days(std::make_integer_sequence<int, 26>{});
+} catch (std::exception const &e) {
+  fmt::print("Error: {}\n", e.what());
+  return 1;
 }
