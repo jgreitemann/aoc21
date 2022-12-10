@@ -3,6 +3,7 @@
 #include <concepts>
 #include <iosfwd>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 #include <cor3ntin/rangesnext/generator.hpp>

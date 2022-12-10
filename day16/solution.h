@@ -6,6 +6,7 @@
 #include <functional>
 #include <iterator>
 #include <span>
+#include <utility>
 #include <variant>
 
 #include <cor3ntin/rangesnext/generator.hpp>

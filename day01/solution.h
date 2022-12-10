@@ -3,6 +3,7 @@
 #include "../solution.h"
 
 #include <span>
+#include <utility>
 #include <vector>
 
 #include <cor3ntin/rangesnext/generator.hpp>
