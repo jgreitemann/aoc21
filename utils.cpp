@@ -38,18 +38,22 @@ namespace AoC {
     using cor3ntin::rangesnext::to;
     auto lines = AoC::lines(stream) | to<std::vector>();
     auto const line_len = lines.front().size();
-    auto data = lines | std::views::join
-                | std::views::transform([](char c) { return static_cast<int>(c - '0'); })
-                | to<std::vector>();
-    return {std::move(data), {data.data(), Dyn2DExtents{data.size() / line_len, line_len}}};
+    std::pair<std::vector<int>, View2D<int const>> result;
+    result.first = lines | std::views::join
+                   | std::views::transform([](char c) { return static_cast<int>(c - '0'); })
+                   | to<std::vector>();
+    result.second = {result.first.data(), Dyn2DExtents{result.first.size() / line_len, line_len}};
+    return result;
   }
 
   auto parse_char_image(std::istream &stream) -> std::pair<std::vector<char>, View2D<char>> {
     using cor3ntin::rangesnext::to;
     auto image_lines = lines(stream) | to<std::vector>();
-    auto data = image_lines | std::views::join | to<std::vector>();
-    return {std::move(data),
-            {data.data(), Dyn2DExtents{image_lines.size(), image_lines.front().size()}}};
+    std::pair<std::vector<char>, View2D<char>> result;
+    result.first = image_lines | std::views::join | to<std::vector>();
+    result.second = {result.first.data(),
+                     Dyn2DExtents{image_lines.size(), image_lines.front().size()}};
+    return result;
   }
 
 
