@@ -9,6 +9,32 @@ namespace Day21 {
     return std::stoi(line.substr(first_digit));
   }
 
+  DeterministicGame::DeterministicGame(int player_1, int player_2)
+      : player_1(player_1)
+      , player_2(player_2) {}
+
+  bool DeterministicGame::take_turn_player_1() {
+    return take_turn(player_1, player_1_score);
+  }
+  bool DeterministicGame::take_turn_player_2() {
+    return take_turn(player_2, player_2_score);
+  }
+
+  bool DeterministicGame::take_turn(int &player, int &score) {
+    player = (player - 1 + roll() + roll() + roll()) % 10 + 1;
+    score += player;
+    number_of_rolls += 3;
+    return score < 1000;
+  }
+
+  int DeterministicGame::roll() {
+    return std::exchange(dice, dice % 100 + 1);
+  }
+
+  auto DeterministicGame::answer() const -> std::size_t {
+    return std::min(player_1_score, player_2_score) * number_of_rolls;
+  }
+
 }// namespace Day21
 
 namespace AoC {
@@ -18,9 +44,9 @@ namespace AoC {
       , player_2_starting_pos(Day21::read_number_at_end_of_line(stream)) {}
 
   auto Solution<21>::part1() const -> std::size_t {
-    auto die = Day21::deterministic_die;
-    auto result = Day21::play(player_1_starting_pos, player_2_starting_pos, die);
-    return std::min(result.player_1_score, result.player_2_score) * result.number_of_rolls;
+    auto const game =
+            Day21::play<Day21::DeterministicGame>(player_1_starting_pos, player_2_starting_pos);
+    return game.answer();
   }
 
 }// namespace AoC

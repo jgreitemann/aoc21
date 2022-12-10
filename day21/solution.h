@@ -5,28 +5,33 @@
 
 namespace Day21 {
 
-  struct PlayResult {
-    std::size_t number_of_rolls;
-    int player_1_score;
-    int player_2_score;
+  struct DeterministicGame {
+    explicit DeterministicGame(int player_1, int player_2);
+    bool take_turn_player_1();
+    bool take_turn_player_2();
+    auto answer() const -> std::size_t;
+
+  private:
+    bool take_turn(int& player, int& score);
+    int roll();
+
+    int dice = 1;
+
+  public:
+    int player_1;
+    int player_2;
+    int player_1_score = 0;
+    int player_2_score = 0;
+    std::size_t number_of_rolls = 0;
   };
 
-  bool take_turn(int &player, int &score, auto &die, std::size_t &number_of_rolls) {
-    player = (player - 1 + die() + die() + die()) % 10 + 1;
-    score += player;
-    number_of_rolls += 3;
-    return score < 1000;
-  }
-
-  auto play(int player_1, int player_2, auto &&die) -> PlayResult {
-    PlayResult result{};
-    while (take_turn(player_1, result.player_1_score, die, result.number_of_rolls)
-           && take_turn(player_2, result.player_2_score, die, result.number_of_rolls))
+  template <typename Game>
+  auto play(int player_1, int player_2) -> Game {
+    Game game{player_1, player_2};
+    while (game.take_turn_player_1() && game.take_turn_player_2())
       ;
-    return result;
+    return game;
   }
-
-  constexpr auto deterministic_die = [x = 0]() mutable { return x = x % 100 + 1; };
 
 }// namespace Day21
 
