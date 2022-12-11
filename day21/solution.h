@@ -3,6 +3,8 @@
 #include "../solution.h"
 #include "../utils.h"
 
+#include <experimental/mdspan>
+
 namespace Day21 {
 
   struct DeterministicGame {
@@ -25,6 +27,21 @@ namespace Day21 {
     std::size_t number_of_rolls = 0;
   };
 
+  struct QuantumGame {
+    explicit QuantumGame(int player_1, int player_2);
+    bool take_turn_player_1();
+    bool take_turn_player_2();
+
+    auto answer() const -> std::size_t;
+
+  private:
+    bool take_turn(auto&& access_fn);
+
+    using Extents = std::experimental::extents<22,22,10,10>;
+    std::vector<std::size_t> universes_data;
+    std::experimental::mdspan<std::size_t, Extents> universes_view;
+  };
+
   template <typename Game>
   auto play(int player_1, int player_2) -> Game {
     Game game{player_1, player_2};
@@ -41,6 +58,7 @@ namespace AoC {
   struct Solution<21> {
     explicit Solution(std::istream &);
     auto part1() const -> std::size_t;
+    auto part2() const -> std::size_t;
 
   private:
     int player_1_starting_pos;

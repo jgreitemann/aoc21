@@ -55,3 +55,8 @@ TEST(Day21, play_deterministically) {
   EXPECT_EQ(result.player_2_score, 745);
   EXPECT_EQ(result.number_of_rolls, 993);
 }
+
+TEST(Day21, play_with_dirac_dice) {
+  auto result = play<QuantumGame>(4, 8);
+  EXPECT_EQ(result.answer(), 444356092776315);
+}
